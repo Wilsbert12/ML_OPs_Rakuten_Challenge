@@ -133,6 +133,20 @@ def save_processed_data(X_features, y_target, vectorizer, df_processed, data_inf
     """Save processed features, text versions, and vectorizer"""
     print("Saving processed data...")
     
+    def convert_numpy_types(obj):
+        """Convert numpy types to Python native types for JSON serialization"""
+        if isinstance(obj, np.integer):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, dict):
+            return {key: convert_numpy_types(value) for key, value in obj.items()}
+        elif isinstance(obj, list):
+            return [convert_numpy_types(item) for item in obj]
+        return obj
+
     # Create timestamp for versioning
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     
@@ -182,13 +196,13 @@ def save_processed_data(X_features, y_target, vectorizer, df_processed, data_inf
     
     metadata_path = os.path.join(PROCESSED_DATA_DIR, f'preprocessing_metadata_{timestamp}.json')
     with open(metadata_path, 'w') as f:
-        json.dump(metadata, f, indent=2)
+        json.dump(convert_numpy_types(metadata), f, indent=2)
     
     # Save "latest" symlinks for easy access
     latest_metadata_path = os.path.join(PROCESSED_DATA_DIR, 'latest_preprocessing.json')
     with open(latest_metadata_path, 'w') as f:
-        json.dump(metadata, f, indent=2)
-    
+        json.dump(convert_numpy_types(metadata), f, indent=2)
+
     print(f"Features saved: {features_path}")
     print(f"Targets saved: {targets_path}")
     print(f"Processed text saved: {text_path}")

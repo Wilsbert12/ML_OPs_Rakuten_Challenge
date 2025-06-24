@@ -234,12 +234,18 @@ def save_gridsearch_model(results, preprocessing_metadata, text_version='text_cl
     # Save model metadata
     metadata_path = os.path.join(MODELS_DIR, f'gridsearch_metadata_{timestamp}.json')
     with open(metadata_path, 'w') as f:
-        json.dump(model_metadata, f, indent=2)
+        metadata_for_json = model_metadata.copy()
+        metadata_for_json.pop('best_estimator', None)  # Remove the SVM model object
+
+        json.dump(metadata_for_json, f, indent=2)
     
     # Save as "latest" for easy access
     latest_model_path = os.path.join(MODELS_DIR, 'latest_gridsearch_model.json')
     with open(latest_model_path, 'w') as f:
-        json.dump(model_metadata, f, indent=2)
+        metadata_for_json = model_metadata.copy()
+        metadata_for_json.pop('best_estimator', None)  # Remove the SVM model object
+
+        json.dump(metadata_for_json, f, indent=2)
     
     print(f"Best model saved: {model_path}")
     print(f"Label encoder saved: {encoder_path}")
@@ -287,3 +293,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+

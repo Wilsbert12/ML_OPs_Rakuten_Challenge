@@ -89,7 +89,7 @@ with tp_col2:
 
 
 with tp_col3:
-    st.image("images\profile_pictures\qi_bao.png", use_container_width=True)
+    st.image("images/profile_pictures/qi_bao.png", use_container_width=True)
     st.info("Qi Bao")
 
     # Display primary contribution information directly

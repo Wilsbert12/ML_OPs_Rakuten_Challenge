@@ -89,11 +89,7 @@ with tp_col2:
 
 
 with tp_col3:
-<<<<<<< HEAD
     st.image("images/profile_pictures/qi_bao.png", use_container_width=True)
-=======
-    st.image("images\profile_pictures\qi_bao.png", use_container_width=True)
->>>>>>> b99cccd0600d9f24ec118c747a168ec4af6ed29d
     st.info("Qi Bao")
 
     # Display primary contribution information directly

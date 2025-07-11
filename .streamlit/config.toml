@@ -1,2 +1,0 @@
-# Tell Streamlit Cloud to use a specific requirements file
-requirementsFile = "requirements.txt"

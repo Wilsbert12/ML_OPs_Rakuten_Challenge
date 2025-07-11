@@ -1,6 +1,6 @@
 # 4_Flowcharts.py
 import streamlit as st
-from streamlit_mermaid import st_mermaid
+#from streamlit_mermaid import st_mermaid
 from containers.rakuten_st.streamlit_utils import add_pagination_and_footer
 
 st.set_page_config(
@@ -12,6 +12,7 @@ st.set_page_config(
 st.progress(4 / 7)
 st.title("Flowcharts")
 
+st.image("images/screenshots/flowchart.png", caption="Flowcharts for the MAY25 BDS project [PLACEHOLDER]", use_container_width=True)
 
 # Pagination and footer
 st.markdown("---")

@@ -1,6 +1,6 @@
 # 4_Flowcharts.py
 import streamlit as st
-import mermaid as md
+from streamlit_mermaid import st_mermaid
 from containers.rakuten_st.streamlit_utils import add_pagination_and_footer
 
 st.set_page_config(

@@ -1,2 +1,0 @@
-# Streamlit-specific visualization library for flowcharts
-streamlit_mermaid>=0.3.0

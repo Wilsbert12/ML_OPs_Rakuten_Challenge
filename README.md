@@ -106,7 +106,7 @@ docker compose up -d               # Standard way to start all services
 
 *Note: If you encounter issues with simultaneous container startup due to system limitations, services will retry automatically. All containers should be running within a few minutes.*
 
-### Access Services
+**Note:** The scripts handle system packages, Docker installation, and data loading.
 
 - **Airflow** (Workflow GUI): [http://localhost:8080](http://localhost:8080)  
   - **Username:** `airflow`  
@@ -127,6 +127,14 @@ docker compose up -d               # Standard way to start all services
 - **Prometheus** (Metrics Collection): [http://localhost:9090](http://localhost:9090) ⭐ **NEW**
   - **Metrics endpoint**: Real-time system and ML metrics
 
+- **Grafana** (Monitoring Dashboards): [http://localhost:3000](http://localhost:3000) ⭐ **NEW**
+  - **Username:** `admin`  
+  - **Password:** `admin`
+
+- **Prometheus** (Metrics Collection): [http://localhost:9090](http://localhost:9090) ⭐ **NEW**
+  - **Username:** None required  
+  - **Password:** None required
+
 - **pgAdmin** (database GUI): [http://localhost:8081](http://localhost:8081)  
   - **Email:** `rakuten@admin.com`  
   - **Password:** `rakutenadmin`
@@ -135,8 +143,6 @@ docker compose up -d               # Standard way to start all services
   - **Username:** `rakutenadmin`  
   - **Password:** `rakutenadmin`
    - *If accessing from another machine, replace localhost with your server's IP address*
-
-**Note:** The scripts handle system packages, Docker installation, and data loading.
 
 ### Load Data
 
@@ -309,12 +315,15 @@ The system implements intelligent retraining based on multiple signals:
 
 ### Infrastructure Containers
 - **Airflow**: Workflow orchestration and scheduling
+  - API Server (port 8080)
+  - Scheduler, DAG Processor, Worker, Triggerer
 - **PostgreSQL**: Structured data storage (text features, metadata)
 - **MinIO**: Object storage for images and large files
 - **Redis**: Airflow message broker and caching
 - **MLflow**: Experiment tracking and model registry
 - **Prometheus**: Metrics collection and storage ⭐ NEW
 - **Grafana**: Monitoring dashboards and visualization ⭐ NEW
+- **StatsD Exporter**: ML metrics bridge for Prometheus integration ⭐ NEW
 
 ### Container Orchestration
 All services run in isolated Docker containers with:
@@ -351,7 +360,12 @@ The system actively tracks and visualizes comprehensive MLOps metrics:
 - System health across all components
 - Business KPIs and classification accuracy trends
 
-**Dashboard Access:** [http://localhost:3000](http://localhost:3000) → Navigate to "MLflow Metrics"
+**Dashboard Access:** [http://localhost:3000](http://localhost:3000) → Navigate to "Dashboards" → "MLflow Metrics Dashboard"
+
+**Available Dashboards:**
+- **Model Performance**: Accuracy, F1 score, CV score trends over time
+- **Training Operations**: Total model runs, best scores in last 24 hours
+- **System Health**: API metrics, container status, resource utilization
 
 ## Technology Stack ⭐ UPDATED
 

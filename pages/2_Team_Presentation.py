@@ -27,9 +27,9 @@ with tp_col1:
 
     # Display primary contribution information directly
     st.write("**Primary Contributions:**")
-    st.write("• Contribution #1")
-    st.write("• Contribution #2")
-    st.write("• Contribution #3")
+    st.write("• MLFlow tracking")
+    st.write("• Evidently drift detection")
+    st.write("• Prometheus scraping & Grafana visualization")
 
     with st.expander("… more info"):
         st.markdown(

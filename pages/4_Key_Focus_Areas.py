@@ -1,4 +1,4 @@
-# pages/03_Key_Focus_Areas.py
+# pages/4_Key_Focus_Areas.py
 import streamlit as st
 from containers.rakuten_st.streamlit_utils import add_pagination_and_footer
 
@@ -135,7 +135,7 @@ volume_df = pd.DataFrame(volume_data)
 dag_df = pd.DataFrame(dag_data)
 custom_images_df = pd.DataFrame(custom_images_data)
 
-st.progress(3 / 7)
+st.progress(4 / 8)
 st.title("Key Focus Areas")
 
 # Project Outline content
@@ -250,4 +250,4 @@ with custom_image_tab:
     
 # Pagination and footer
 st.markdown("---")
-add_pagination_and_footer("pages/3_Key_Focus_Areas.py")
+add_pagination_and_footer("pages/4_Key_Focus_Areas.py")

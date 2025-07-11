@@ -22,7 +22,7 @@ tp_col1, tp_col2, tp_col3, tp_col4 = st.columns(4)  # tp_ as in "team presentati
 
 
 with tp_col1:
-    st.image("images/profile_pictures/marie_erno-moller.jpg", use_container_width=True)
+    st.image("images/profile_pictures/marie_erno-moller.png", use_container_width=True)
     st.info("Marie Ernø-Møller")
 
     # Display primary contribution information directly
@@ -60,9 +60,9 @@ with tp_col2:
 
     # Display primary contribution information directly
     st.write("**Primary Contributions:**")
-    st.write("• Refactoring")
+    st.write("• Preprocessing of text data")
     st.write("• Streamlit presentation")
-    st.write("• Preprocessing of text and images")
+    st.write("• Refactoring")
 
     with st.expander("… more info"):
         st.markdown(
@@ -94,9 +94,9 @@ with tp_col3:
 
     # Display primary contribution information directly
     st.write("**Primary Contributions:**")
-    st.write("• Contribution #1")
-    st.write("• Contribution #2")
-    st.write("• Contribution #3")
+    st.write("• Foundational Architecture")
+    st.write("• Airflow Orchestration")
+    st.write("• Project Management")
 
     with st.expander("… more info"):
         st.markdown(
@@ -106,14 +106,12 @@ with tp_col3:
         
 
         **Former positions:**
-        - Position #1
-        - Position #2
-        - Position #3
+        - Go-To-Market Manager in telecommunications
         
         **Skills & Expertise:**
-        - Skill #1
-        - Skill #2
-        - Skill #3
+        - Virtual Machines
+        - Web scraping
+
         
         **Links:**
         - [GitHub Profile](https://github.com/Pockyee)

@@ -22,22 +22,14 @@ st.write("## eCommerce Products Classification Project")
 st.markdown(
     """
     This Streamlit app is part of the final project for **_DataScientist_**'s training in **Machine Learning Operations** of the cohort **MAY25 BMLOPS**.
+
+    **Primary Objective:** Build a production-ready machine learning infrastructure that can reliably process French product titles and descriptions and classify them into appropriate categories while maintaining operational excellence during the entire machine learning lifecycle from data ingestion and preprocessing to model deployment and monitoring.
     
-    Building upon a previous Rakuten product classification challenge, this project demonstrates a **MLOps pipeline** that automates the entire machine learning lifecycle from data ingestion to model deployment and monitoring.
-    
-    One solution could be an automation via **multimodal machine learning** combining text and image data.
-    
-    **Technical Implementation**
-    * **Apache Airflow** orchestration for automated workflow management
-    * **Docker** containerization for scalable and reproducible ML workloads
-    * **MLflow** integration for experiment tracking and model registry
-    * **PostgreSQL** for metadata storage and MinIO for artifact management
-    * **Continuous** Integration/Continuous Deployment (CI/CD) pipelines
-    * **Real-time monitoring** and performance tracking capabilities
+    _Please note:_ This project does not focus on the model's accuracy and performance but rather on the MLOps **pipeline's robustness and scalability**.
     
     Use the sidebar or pagination to browse through the presentation of the project and the team, ...
     
-    **:material/folder_code: GitHub Repository:** [rakuten_project](https://github.com/your-username/rakuten_project)
+    **:material/folder_code: GitHub Repository:** [may25_bds_classification-of-rakuten-e-commerce-products](https://github.com/PeterStieg/may25_bds_classification-of-rakuten-e-commerce-products/)
     
     """
 )

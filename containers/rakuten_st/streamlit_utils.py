@@ -3,7 +3,9 @@ import streamlit as st
 PAGE_SEQUENCE = [
     {"name": "1. Home", "path": "pages/1_Home.py"},
     {"name": "2. Team Presentation", "path": "pages/2_Team_Presentation.py"},
-    {"name": "3. Project Outline", "path": "pages/3_Project_Outline.py"},
+    {"name": "3. Key Focus Areas", "path": "pages/3_Key_Focus_Areas.py"},
+    {"name": "4. Flowcharts", "path": "pages/4_Flowcharts.py"},
+    {"name": "10. tmp", "path": "pages/10_tmp.py"}
 ]
 
 def add_pagination_and_footer(current_page_path):

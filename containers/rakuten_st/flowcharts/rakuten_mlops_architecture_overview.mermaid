@@ -1,0 +1,80 @@
+graph TB
+    %% Data Ingestion
+    subgraph DataIngestion ["Data Ingestion"]
+        Airflow[Airflow Container] 
+        DataDAG[Data Preparation DAG]
+        PostgreSQL[("PostgreSQL Database (container)")]
+        MinIO[("MinIO Object Storage (container)")]
+        
+        Airflow --> DataDAG
+        DataDAG -->|2k batches every 15min| DataDAG
+        DataDAG --> PostgreSQL
+        DataDAG --> MinIO
+    end
+    
+    %% Model Training
+    subgraph ModelTraining ["Model Training"]
+        MLDAG[ML Pipeline DAG]
+        MLContainer[ML Container]
+        Training[Model Training<br/>GridSearchCV]
+        Evaluation[Model Evaluation]
+        MLflow[("MLflow Model Registry (container)")]
+        
+        Airflow --> MLDAG
+        MLDAG --> MLContainer
+        MLContainer --> Training
+        Training --> Evaluation
+        Evaluation --> MLflow
+        MLflow -->|current best model| MLContainer
+        MLContainer --> FastAPI
+    end
+    
+    %% Monitoring & Triggering
+    subgraph MonitoringTriggering ["Monitoring & Triggering"]
+        Prometheus[Prometheus Container]
+        Accuracy[Accuracy Monitoring]
+        DataBacklog[Data Backlog]
+        DriftDetection[Drift Detection<br/>Evidently]
+        SmartTrigger[Smart Trigger Mechanism<br/>F1 < 0.7 OR Backlog ≥ 10k]
+        RetrainTrigger{Retraining Trigger}
+        
+        FastAPI --> Prometheus
+        PostgreSQL --> Prometheus
+        MLContainer --> Prometheus
+        Prometheus --> Accuracy
+        Prometheus --> DataBacklog
+        PostgreSQL --> DriftDetection
+        Accuracy --> SmartTrigger
+        DataBacklog --> SmartTrigger
+        DriftDetection --> SmartTrigger
+        SmartTrigger --> RetrainTrigger
+        RetrainTrigger -.->|only if needed| MLDAG
+    end
+    
+    %% Real-time Serving
+    subgraph RealTimeServing ["Real-time Serving"]
+        FastAPI[FastAPI Container]
+        RealTimeRequests[Real Time Requests]
+        RealTimePredictions[Real Time Predictions]
+        
+        RealTimeRequests --> FastAPI
+        FastAPI --> RealTimePredictions
+    end
+    
+    %% Visualization
+    subgraph Visualization ["Visualization"]
+        Grafana[Grafana Container]
+        
+        Prometheus --> Grafana
+    end
+    
+    %% Styling
+    classDef container fill:#e1f5fe
+    classDef storage fill:#f3e5f5
+    classDef service fill:#e8f5e8
+    classDef monitoring fill:#fff3e0
+    
+    class MLContainer,FastAPI,Airflow,Prometheus,Grafana container
+    class PostgreSQL,MinIO,MLflow storage
+    class DataDAG,MLDAG service
+    class Accuracy,DataBacklog,DriftDetection monitoring

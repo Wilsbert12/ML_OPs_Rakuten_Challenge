@@ -6,13 +6,13 @@ from containers.rakuten_st.streamlit_utils import add_pagination_and_footer
 # Page configuration
 st.set_page_config(
     page_title="MAY25 BMLOPS // Rakuten: Classification of eCommmerce products",
-    page_icon="images/logos/rakuten-favicon.ico",
+    page_icon="containers/rakuten_st/images/logos/rakuten-favicon.ico",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # Logo display
-st.logo(image="images/logos/rakuten-logo-red-wide.svg", size="large", icon_image="images/logos/rakuten-logo-red-square.svg")
+st.logo(image="containers/rakuten_st/images/logos/rakuten-logo-red-wide.svg", size="large", icon_image="containers/rakuten_st/images/logos/rakuten-logo-red-square.svg")
 
 st.progress(1 / 8)
 st.title("MAY25 BMLOPS // Rakuten")

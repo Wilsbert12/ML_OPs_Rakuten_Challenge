@@ -1,9 +1,17 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from airflow.providers.docker.operators.docker import DockerOperator
 from datetime import datetime
+from docker.types import Mount
 from tasks.download import download_raw_data
 # from tasks.utils import unzip_file
-from tasks.upload import load_x_to_pg, load_y_to_pg, drop_pg_tables
+from tasks.upload import load_xy_to_pg, drop_pg_tables
+import os
+
+TEST_SET_FRACTION = 0.05
+
+# Read Project root from .env
+PROJECT_ROOT = os.environ.get('AIRFLOW_PROJECT_ROOT') 
 
 with DAG(
     dag_id='reset_data',
@@ -28,24 +36,48 @@ with DAG(
     )
     
     task_3 = PythonOperator(
-        task_id='split_x_test',
-        python_callable=load_x_to_pg,
+        task_id='split_xy_test',
+        python_callable=load_xy_to_pg,
         op_kwargs={
-            'csv_path': "/opt/airflow/raw_data/x_train.csv",
-            'table_name': "x_test",
-            'start_row': 80000
+            'x_path': "/opt/airflow/raw_data/x_train.csv",
+            'y_path': "/opt/airflow/raw_data/y_train.csv",
+            'x_table': "x_test",
+            'y_table': "y_test",
+            'method': "sample",
+            'frac': TEST_SET_FRACTION
         }
     )
     
-    task_4 = PythonOperator(
-        task_id='split_y_test',
-        python_callable=load_y_to_pg,
-        op_kwargs={
-            'csv_path': "/opt/airflow/raw_data/y_train.csv",
-            'table_name': "y_test",
-            'start_row': 80000
-        }
+    task_4 = DockerOperator(
+        task_id='run_preprocessing_docker_for',
+        image='rakuten-ml:latest',  # Your ML container image
+        command='python scripts/preprocessing_test_data.py',
+        docker_url='unix://var/run/docker.sock',
+        network_mode='rakuten_project_default',  # Connect to your project's Docker network
+        mounts=[
+            Mount(source=f'{PROJECT_ROOT}/processed_data', target='/app/processed_data', type='bind'),
+            Mount(source=f'{PROJECT_ROOT}/models', target='/app/models', type='bind'),
+        ],
+        environment={
+            'PYTHONPATH': '/app',
+            'PYTHONUNBUFFERED': '1'
+        },
+        auto_remove='success',
+        mount_tmp_dir=False,
+        doc_md="""
+        ## Preprocessing Docker Task
         
+        Runs preprocessing.py in an isolated ML container:
+        - Container has all ML dependencies (sklearn, nltk, etc.)
+        - Connects to PostgreSQL via Docker network
+        - Mounts volumes for data persistence
+        - Processes French text and creates TF-IDF features
+        
+        **Container Setup:**
+        - Image: rakuten-ml:latest
+        - Network: rakuten_project_default (access to postgres)
+        - Volumes: Maps host directories to container
+        """
     )
     # task_2 = PythonOperator(
     #     task_id='unzip_image',
@@ -56,4 +88,4 @@ with DAG(
     #     }  
     # )
     
-    task_1 >> task_2 >> [task_3, task_4]
+    task_1 >> task_2 >> task_3 >> task_4

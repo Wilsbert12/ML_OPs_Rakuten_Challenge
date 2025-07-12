@@ -24,10 +24,18 @@ from scipy.sparse import load_npz
 from collections import Counter
 import mlflow
 import mlflow.sklearn
+from mlflow.exceptions import RestException
 
 # Directories
 PROCESSED_DATA_DIR = 'processed_data'
 MODELS_DIR = 'models'
+
+try:
+    from statsd import StatsClient
+    statsd = StatsClient(host="statsd-exporter", port=8125, prefix="mlflow")
+except ImportError:
+    statsd = None
+    print("⚠️  'statsd' package not installed. Metrics will not be exported to Prometheus.")
 
 mlflow.set_tracking_uri("http://mlflow:5000")
 mlflow.set_experiment("RakutenTraining")
@@ -51,6 +59,14 @@ def load_latest_processed_data():
     print(f"Loaded {len(text_df)} samples")
     print(f"Available text versions: {list(text_df.columns)}")
     
+    return text_df, metadata
+
+def load_eval_data():
+    with open(os.path.join(PROCESSED_DATA_DIR, 'preprocessing_metadata_test.json'), 'r') as f:
+        metadata = json.load(f)
+    text_df = pd.read_csv(metadata['text_path'])
+    print(f"Loaded {len(text_df)} samples")
+    print(f"Available text versions: {list(text_df.columns)}")
     return text_df, metadata
 
 def print_class_distribution(y, dataset_name):
@@ -140,7 +156,7 @@ def create_pipeline_and_param_grid():
     
     return pipeline, param_grid
 
-def train_with_gridsearch(X_train, X_test, y_train, y_test, pipeline, param_grid):
+def train_with_gridsearch(X_train, X_test, y_train, y_test, pipeline, param_grid, X_eval, y_eval):
     """Train models using GridSearchCV"""
     print("Starting GridSearchCV training...")
     print("This may take some time depending on the parameter grid size...")
@@ -149,6 +165,7 @@ def train_with_gridsearch(X_train, X_test, y_train, y_test, pipeline, param_grid
     label_encoder = LabelEncoder()
     y_train_encoded = label_encoder.fit_transform(y_train)
     y_test_encoded = label_encoder.transform(y_test)
+    y_eval_encoded = label_encoder.transform(y_eval)  # added for eval
     
     # Perform grid search with weighted F1 score
     grid_search = GridSearchCV(
@@ -191,12 +208,29 @@ def train_with_gridsearch(X_train, X_test, y_train, y_test, pipeline, param_grid
     print("\nClassification Report on Test Set:")
     print(classification_report(y_test, y_test_pred))
     
+    # Predict on the evaluation set
+    y_eval_pred_encoded = grid_search.best_estimator_.predict(X_eval)
+    y_eval_pred = label_encoder.inverse_transform(y_eval_pred_encoded)
+
+    # Calculate eval metrics
+    eval_f1 = f1_score(y_eval, y_eval_pred, average='weighted')
+    eval_accuracy = accuracy_score(y_eval, y_eval_pred)
+    
+    n_samples = len(X_train) + len(X_test)
+    
+    print(f"\nEval Set Weighted F1 Score: {eval_f1:.4f}")
+    print(f"Eval Set Accuracy: {eval_accuracy:.4f}")
+    print("\nClassification Report on Eval Set:")
+    print(classification_report(y_eval, y_eval_pred))
+    
     # Prepare results
     results = {
         'best_params': grid_search.best_params_,
         'best_cv_score': grid_search.best_score_,
         'test_f1_score': test_f1,
         'test_accuracy': test_accuracy,
+        'eval_f1_score': eval_f1,
+        'eval_accuracy': eval_accuracy,
         'label_encoder': label_encoder,
         'best_estimator': grid_search.best_estimator_
     }
@@ -204,8 +238,18 @@ def train_with_gridsearch(X_train, X_test, y_train, y_test, pipeline, param_grid
     mlflow.log_metrics({
         "cv_score": float(grid_search.best_score_),
         "test_f1": float(test_f1),
-        "test_accuracy": float(test_accuracy)
+        "test_accuracy": float(test_accuracy),
+        "eval_f1": float(eval_f1),
+        "eval_accuracy": float(eval_accuracy),
+        "n_samples": int(n_samples)
     })
+    
+    # Send metrics to StatsD (Prometheus)
+    if statsd:
+        statsd.incr("experiment_run_total")  # Increment total runs
+        statsd.gauge("accuracy", test_accuracy)
+        statsd.gauge("f1", test_f1)
+        statsd.gauge("cv", grid_search.best_score_)
     
     return results
 
@@ -271,6 +315,70 @@ def save_gridsearch_model(results, preprocessing_metadata, text_version='text_cl
     
     return model_metadata
 
+def register_if_best_model(results, registered_model_name="TheBestModelTillNow"):
+    """
+    Register model only if eval_f1 is better than current production model
+    """
+    client = mlflow.tracking.MlflowClient()
+    new_eval_f1 = results["eval_f1_score"]
+    new_eval_accuracy = results["eval_accuracy"]
+
+    try:
+        # Get latest production model
+        latest_versions = client.get_latest_versions(registered_model_name, stages=["Production"])
+        if latest_versions:
+            current_model = latest_versions[0]
+            current_run_id = current_model.run_id
+            current_run = client.get_run(current_run_id)
+            current_eval_f1 = float(current_run.data.metrics.get("eval_f1", 0.0))
+            print(f"Current registered eval_f1: {current_eval_f1:.4f}")
+        else:
+            current_eval_f1 = 0.0
+            print("No production model registered yet.")
+
+    except RestException:
+        print(f"No registered model named '{registered_model_name}' found. Creating new one...")
+        current_eval_f1 = 0.0
+
+    if new_eval_f1 > current_eval_f1:
+        print(f"New model eval_f1 ({new_eval_f1:.4f}) is better. Registering model...")
+        model_uri = f"runs:/{mlflow.active_run().info.run_id}/model"
+        result = mlflow.register_model(model_uri, registered_model_name)
+
+        # Record model key metrics as tag
+        client.set_model_version_tag(
+            name=registered_model_name,
+            version=result.version,
+            key="eval_f1",
+            value=f"{new_eval_f1:.4f}"
+        )
+        client.set_model_version_tag(
+            name=registered_model_name,
+            version=result.version,
+            key="eval_accuracy",
+            value=f"{new_eval_accuracy:.4f}"
+        )
+        
+        # Transition to production
+        client.transition_model_version_stage(
+            name=registered_model_name,
+            version=result.version,
+            stage="Production",
+            archive_existing_versions=True
+        )
+        print(f"Model registered and transitioned to Production (version {result.version})")
+        
+        best_model_path = os.path.join(MODELS_DIR, 'the_best_model.pkl')
+        best_encoder_path = os.path.join(MODELS_DIR, 'the_label_encoder.pkl')
+        
+        with open(best_model_path, 'wb') as f_model:
+            pickle.dump(results['best_estimator'], f_model)
+
+        with open(best_encoder_path, 'wb') as f_enc:
+            pickle.dump(results['label_encoder'], f_enc)
+    else:
+        print(f"New model eval_f1 ({new_eval_f1:.4f}) is not better than current ({current_eval_f1:.4f}). Not registering.")
+
 def main():
     """Main training pipeline with GridSearchCV"""
     print("Starting GridSearchCV training pipeline...")
@@ -281,10 +389,14 @@ def main():
         try:
             # Step 1: Load preprocessed data
             text_df, preprocessing_metadata = load_latest_processed_data()
+            text_df_eval, preprocessing_metadata_eval = load_eval_data()
             
             # Step 2: Extract features and target (using classical ML text)
             X = text_df['text_classical']  # Use heavily preprocessed text
             y = text_df['prdtypecode']
+            
+            X_eval = text_df_eval['text_classical']
+            y_eval = text_df_eval['prdtypecode']
             
             print(f"Using text_classical for training ({len(X)} samples)")
             
@@ -295,10 +407,13 @@ def main():
             pipeline, param_grid = create_pipeline_and_param_grid()
             
             # Step 5: Train with GridSearchCV
-            results = train_with_gridsearch(X_train, X_test, y_train, y_test, pipeline, param_grid)
+            results = train_with_gridsearch(X_train, X_test, y_train, y_test, pipeline, param_grid, X_eval, y_eval)
             
             # Step 6: Save best model
             model_metadata = save_gridsearch_model(results, preprocessing_metadata)
+            
+            # Step 7: Conditionally register model
+            register_if_best_model(results, model_metadata["model_path"])
             
             print("=" * 60)
             print("TRAINING COMPLETED SUCCESSFULLY!")

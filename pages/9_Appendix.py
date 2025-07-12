@@ -1,4 +1,4 @@
-# pages/4_Key_Focus_Areas.py
+# pages/9_Appendix.py
 import streamlit as st
 from containers.rakuten_st.streamlit_utils import add_pagination_and_footer
 
@@ -7,7 +7,7 @@ import pandas as pd
 
 # Page configuration
 st.set_page_config(
-    page_title="MAY25 BMLOPS // Key Focus Areas",
+    page_title="MAY25 BMLOPS // Appendix",
     page_icon="containers/rakuten_st/images/logos/rakuten-favicon.ico",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -135,8 +135,8 @@ volume_df = pd.DataFrame(volume_data)
 dag_df = pd.DataFrame(dag_data)
 custom_images_df = pd.DataFrame(custom_images_data)
 
-st.progress(4 / 8)
-st.title("Key Focus Areas")
+st.progress(9 / 9)
+st.title("Appendix")
 
 # Project Outline content
 container_tab, volume_tab, dag_tab, custom_image_tab = st.tabs(["Containers", "Volumes", "DAGs", "Custom images"]
@@ -250,4 +250,4 @@ with custom_image_tab:
     
 # Pagination and footer
 st.markdown("---")
-add_pagination_and_footer("pages/4_Key_Focus_Areas.py")
+add_pagination_and_footer("pages/9_Appendix.py")

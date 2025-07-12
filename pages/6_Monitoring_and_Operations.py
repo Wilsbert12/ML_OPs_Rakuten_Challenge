@@ -31,7 +31,7 @@ st.set_page_config(
     layout="wide",
 )
 
-st.progress(6 / 8)
+st.progress(6 / 9)
 st.title("Monitoring and Operations")
 
 st.markdown("""

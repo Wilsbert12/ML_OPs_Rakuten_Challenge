@@ -9,7 +9,7 @@ st.set_page_config(
     layout="wide",
 )
 
-st.progress(3 / 8)
+st.progress(3 / 9)
 st.title("Flowcharts")
 
 # Project Outline content

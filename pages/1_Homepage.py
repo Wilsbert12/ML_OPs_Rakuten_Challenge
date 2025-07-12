@@ -14,7 +14,7 @@ st.set_page_config(
 # Logo display
 st.logo(image="containers/rakuten_st/images/logos/rakuten-logo-red-wide.svg", size="large", icon_image="containers/rakuten_st/images/logos/rakuten-logo-red-square.svg")
 
-st.progress(1 / 8)
+st.progress(1 / 9)
 st.title("MAY25 BMLOPS // Rakuten")
 
 # Home page content

@@ -27,7 +27,7 @@ def parse_timeseries_result(result):
 
 st.set_page_config(
     page_title="MAY25 BDS // Monitoring and Operations",
-    page_icon="images/logos/rakuten-favicon.ico",
+    page_icon="containers/rakuten_st/images/logos/rakuten-favicon.ico",
     layout="wide",
 )
 

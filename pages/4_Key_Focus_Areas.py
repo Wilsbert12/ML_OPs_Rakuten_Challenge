@@ -8,13 +8,13 @@ import pandas as pd
 # Page configuration
 st.set_page_config(
     page_title="MAY25 BMLOPS // Key Focus Areas",
-    page_icon="images/logos/rakuten-favicon.ico",
+    page_icon="containers/rakuten_st/images/logos/rakuten-favicon.ico",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # Logo display
-st.logo(image="images/logos/rakuten-logo-red-wide.svg", size="large", icon_image="images/logos/rakuten-logo-red-square.svg")
+st.logo(image="containers/rakuten_st/images/logos/rakuten-logo-red-wide.svg", size="large", icon_image="containers/rakuten_st/images/logos/rakuten-logo-red-square.svg")
 
 
 # Container infrastructure data

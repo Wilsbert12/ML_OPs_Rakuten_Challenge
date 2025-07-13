@@ -14,7 +14,7 @@ st.set_page_config(
 # Logo display
 st.logo(image="containers/rakuten_st/images/logos/rakuten-logo-red-wide.svg", size="large", icon_image="containers/rakuten_st/images/logos/rakuten-logo-red-square.svg")
 
-st.progress(2 / 8)
+st.progress(2 / 9)
 st.title("Team Presentation")
 
 # Create three columns for team members

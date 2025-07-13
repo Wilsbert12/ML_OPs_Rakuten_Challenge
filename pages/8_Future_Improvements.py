@@ -8,7 +8,7 @@ st.set_page_config(
     layout="wide",
 )
 
-st.progress(8 / 8)
+st.progress(8 / 9)
 st.title("Future Improvements")
 
 # Replace content after st.title("Future Improvements") with:

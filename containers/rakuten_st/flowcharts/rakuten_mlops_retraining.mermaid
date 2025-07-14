@@ -1,43 +1,115 @@
 graph TD
-    %% Data Ingestion
-    Start[New Product Data] --> DataStorage[Store in Database]
+
+    %% RETRAINING NODES
+
+    %% Data Ingestion [DI]
+    Start[New Product Data]
+    DataStorage[Store in Database]
     
-    %% Immediate Training Decision
-    DataStorage --> TrainingTrigger{Training Trigger?<br/>- Enough data? 2k+ samples<br/>- Accuracy below threshold?<br/>- Drift above threshold?}
-    TrainingTrigger -->|Yes| FeatureEngineering[Feature Engineering<br/>Text Preprocessing]
-    TrainingTrigger -->|No| WaitingState[Monitor & Wait]
+    %% DI EDGE
+    Start --> DataStorage
+
     
-    %% Model Development Cycle
-    FeatureEngineering --> ModelTraining[Model Training<br/>GridSearchCV]
-    ModelTraining --> ModelEvaluation[Model Evaluation<br/>F1 Score: 73.4%]
-    ModelEvaluation --> ModelRegistry[Save to MLflow]
+    %% Immediate Training Decision [ITD]
+    TrainingTrigger{"`**Trigger Training?**
+    - Sufficient data?
+    _(2k samples)_
+    - Accuracy below threshold?
+    _F1 Score vs 73.4%_
+    - Drift above threshold?`"}
+
+    FeatureEngineering["`**Feature Engineering**
+    Text Preprocessing`"]
+
+    WaitingState["`**Monitor & Wait**`"]
+
+    %% ITD EDGES
+    DataStorage --> TrainingTrigger
+    TrainingTrigger -- "Yes" --> FeatureEngineering
+    TrainingTrigger -- "No" --> WaitingState
+
+
+    %% Model Development Cycle [MDC]
+
+    ModelTraining["`**Model Training**
+    GridSearchCV`"]
+
+    ModelEvaluation["`**Model Evaluation**
+    F1 Score vs 73.4%`"]
     
-    %% Deployment Decision
-    ModelRegistry --> DeploymentDecision{Better than<br/>Current Model?}
-    DeploymentDecision -->|Yes| ModelDeployment[Deploy New Model]
-    DeploymentDecision -->|No| KeepCurrent[Keep Current Model]
+    ModelRegistry["`**Save to MLflow**`"]
+
+    %% MDC EDGES
+    FeatureEngineering --> ModelTraining
+    ModelTraining --> ModelEvaluation
+    ModelEvaluation --> ModelRegistry
+
+
+    %% Deployment Decision [DD]
     
-    %% Production Serving
-    ModelDeployment --> ProductionAPI[Production FastAPI]
+    DeploymentDecision{"Better Than
+    Current Model?"}
+    
+    ModelDeployment["Deploy New Model"]
+    
+    KeepCurrent["Keep Current Model"]
+
+    %% DD EDGES
+    ModelRegistry --> DeploymentDecision
+    DeploymentDecision -- "Yes" --> ModelDeployment
+    DeploymentDecision -- "No" --> KeepCurrent
+
+
+    %% REAL-TIME SERVING [RTS]
+    ProductionAPI["Production FastAPI"]
+    RealTimePredictions["Real-time Predictions"]
+
+    %% RTS EDGES
+    ModelDeployment --> ProductionAPI
     KeepCurrent --> ProductionAPI
-    ProductionAPI --> RealTimePredictions[Real-time Predictions]
+    ProductionAPI --> RealTimePredictions
+
+
+    %% Business Value [BV]
+    BusinessValue["`**Business Value**
+    - Automated Classification
+    - Improved User Experience
+    - Reduced Manual Work`"]
     
-    %% Business Value
-    RealTimePredictions --> BusinessValue[Business Value<br/>- Automated Classification<br/>- Improved User Experience<br/>- Reduced Manual Work]
-    
-    %% Monitoring and Feedback Loop
-    RealTimePredictions --> MonitoringDashboard[Grafana Monitoring]
-    MonitoringDashboard --> PerformanceMetrics[Track Performance<br/>- API Usage<br/>- Prediction Accuracy<br/>- System Health]
-    
-    %% Monitoring is continuous - no further connections needed
-    
-    %% Styling
-    classDef process fill:#e3f2fd
-    classDef decision fill:#fff3e0
-    classDef storage fill:#f3e5f5
-    classDef value fill:#e8f5e8
-    
-    class FeatureEngineering,ModelTraining,ModelEvaluation,ModelDeployment process
-    class TrainingTrigger,DeploymentDecision decision
-    class DataStorage,ModelRegistry storage
-    class BusinessValue,RealTimePredictions,MonitoringDashboard value
+    %% BV EDGE
+    RealTimePredictions --> BusinessValue
+
+
+    %% Monitoring and Triggering [MaT]
+
+    MonitoringDashboard["`**Grafana Monitoring**`"]
+
+    PerformanceMetrics["`**Track Performance**
+    - API Usage
+    - Prediction Accuracy
+    - System Health`"]
+
+
+    %% MaT EDGES
+    RealTimePredictions --> MonitoringDashboard
+    MonitoringDashboard --> PerformanceMetrics
+
+
+    %% STYLING
+    %% Apply default styles to ALL nodes
+    classDef default fill:#FFF,stroke:#333,stroke-width:2px;
+
+    %% Apply default styles to ALL edges
+    linkStyle default stroke:#999,stroke-width:2px,fill:none;
+
+    %% Node-specific styling
+    classDef process fill:#E0F2FE,stroke:#007BFF,stroke-width:1.5px;
+    classDef decision fill:#FFF3E0,stroke:#FFA000,stroke-width:1.5px;
+    classDef storage fill:#FEE2E2,stroke:#D32F2F,stroke-width:1.5px;
+    classDef value fill:#ECFDF5,stroke:#28A745,stroke-width:1.5px;
+
+    %% Applying classes to specific nodes (grouping for readability)
+    class FeatureEngineering,ModelTraining,ModelEvaluation,ModelDeployment process; 
+    class TrainingTrigger,DeploymentDecision decision; 
+    class DataStorage,ModelRegistry storage; 
+    class BusinessValue,RealTimePredictions,MonitoringDashboard value; 

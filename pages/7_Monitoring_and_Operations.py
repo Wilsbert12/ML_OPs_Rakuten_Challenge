@@ -1,3 +1,4 @@
+# pages/7_Monitoring_and_Operations.py
 import streamlit as st
 import streamlit.components.v1 as components
 from containers.rakuten_st.streamlit_utils import add_pagination_and_footer
@@ -257,5 +258,5 @@ time.sleep(15)
 st.rerun()
 
 st.markdown("---")
-add_pagination_and_footer("pages/6_Monitoring_and_Operations.py")
+add_pagination_and_footer("pages/7_Monitoring_and_Operations.py")
 

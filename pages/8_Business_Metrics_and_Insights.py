@@ -1,4 +1,4 @@
-# pages/7_Business_Metrics_and_Insights 
+# pages/8_Business_Metrics_and_Insights 
 import streamlit as st
 from containers.rakuten_st.streamlit_utils import add_pagination_and_footer
 
@@ -82,4 +82,4 @@ with tab3:
 
 # Pagination and footer
 st.markdown("---")
-add_pagination_and_footer("pages/7_Business_Metrics_and_Insights.py")
+add_pagination_and_footer("pages/8_Business_Metrics_and_Insights.py")

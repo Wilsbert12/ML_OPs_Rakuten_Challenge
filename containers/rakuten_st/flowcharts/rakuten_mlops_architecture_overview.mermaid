@@ -1,80 +1,169 @@
-graph TB
-    %% Data Ingestion
-    subgraph DataIngestion ["Data Ingestion"]
-        Airflow[Airflow Container] 
-        DataDAG[Data Preparation DAG]
-        PostgreSQL[("PostgreSQL Database (container)")]
-        MinIO[("MinIO Object Storage (container)")]
+    graph TD
+
+
+        %% ORCHESTRATION [O]
+        subgraph ORCHESTRATION ["`**ORCHESTRATION**`"]
+            %% O NODE
+            Airflow["`**Airflow**
+            _(container)_`"]
+            SpacerO[ ]:::hidden
+        end
+
+
+
+
+        %% DATA INGESTION [DI]
+        subgraph DataIngestion ["`**DATA INGESTION**`"]
+            
+            %% DI NODES
+            
+            DataDAG["`**Data Preparation DAG**`"]
+            
+            PostgreSQL[("`**PostgreSQL**
+            Database _(container)_`")]
+            
+            MinIO[("`**MinIO**
+            Object Storage _(container)_`")]
+
+            SpacerDI[ ]:::hidden
+            
+
+            %% DI EDGES 
+            DataDAG -. "`_batch upload of 2k products every 15min_`" .-> DataDAG
+            DataDAG --> PostgreSQL & MinIO
+            Airflow --> DataDAG
+
+        end
         
-        Airflow --> DataDAG
-        DataDAG -->|2k batches every 15min| DataDAG
-        DataDAG --> PostgreSQL
-        DataDAG --> MinIO
-    end
-    
-    %% Model Training
-    subgraph ModelTraining ["Model Training"]
-        MLDAG[ML Pipeline DAG]
-        MLContainer[ML Container]
-        Training[Model Training<br/>GridSearchCV]
-        Evaluation[Model Evaluation]
-        MLflow[("MLflow Model Registry (container)")]
+
+
+        %% MONITORING & TRIGGERING [MaT]
+        subgraph MonitoringTriggering ["`**MONITORING & TRIGGERING**`"]
+
+            %% MaT NODES
+            Prometheus["`**Prometheus**
+            _(container)_`"]
+
+            Accuracy["`Accuracy Monitoring`"]
+
+            DataBacklog["`Data Backlog`"]
+
+            DriftDetection["`Drift Detection Evidently`"]
+
+            SmartTrigger["`**Smart Trigger Mechanism**
+            1. F1 < 0.7
+            2. Backlog >= 10k`"]
+            
+            RetrainTrigger{"`Retraining Trigger`"}
+
+            SpacerMaT[ ]:::hidden
+
+
+            %% MaT EDGES
+            PostgreSQL --> Prometheus
+            Prometheus --> Accuracy
+            Prometheus --> DataBacklog
+            PostgreSQL --> DriftDetection
+            Accuracy --> SmartTrigger
+            DataBacklog --> SmartTrigger
+            DriftDetection --> SmartTrigger
+            SmartTrigger --> RetrainTrigger
+            %%RetrainTrigger -. "`_only if necessary_`" .-> MLDAG
+
+        end
+
+
+        %% MACHINE LEARNING [ML]
+        subgraph MachineLearning ["`**MACHINE LEARNING**`"]
+
+            %% MT NODES
+            MLDAG["`**ML Pipeline DAG**`"]
+            MLContainer["`**Model Training**
+            _(container)_`"]
+            
+            Training["`**GridSearchCV**
+            Model Training`"]
+            
+            Evaluation["`Model Evaluation`"]
+            
+            MLflow[("`**MLflow**
+            Model Registry _(container)_`")]
+
+            SpacerML[ ]:::hidden
+            
+
+            %% MT NODES
+            Airflow --> MLDAG
+            MLDAG --> MLContainer
+            MLContainer --> Prometheus & Training
+            Training --> Evaluation
+            Evaluation --> MLflow
+            MLflow -- "`_current best model_`" --> MLContainer
+        end
+
+
+
+    %% REAL-TIME SERVING [RTS]
+    subgraph RealTimeServing ["`**REAL-TIME SERVING**`"]
+
+        %% RTS NODES
+
+        FastAPI["`**FastAPI**
+        _(container)_`"]
+
+        RealTimeRequests["`Real Time Requests`"]
         
-        Airflow --> MLDAG
-        MLDAG --> MLContainer
-        MLContainer --> Training
-        Training --> Evaluation
-        Evaluation --> MLflow
-        MLflow -->|current best model| MLContainer
-        MLContainer --> FastAPI
-    end
-    
-    %% Monitoring & Triggering
-    subgraph MonitoringTriggering ["Monitoring & Triggering"]
-        Prometheus[Prometheus Container]
-        Accuracy[Accuracy Monitoring]
-        DataBacklog[Data Backlog]
-        DriftDetection[Drift Detection<br/>Evidently]
-        SmartTrigger[Smart Trigger Mechanism<br/>F1 < 0.7 OR Backlog ≥ 10k]
-        RetrainTrigger{Retraining Trigger}
+        RealTimePredictions["`Real Time Predictions`"]
+
+        SpacerRTS[ ]:::hidden
         
+
+        %% RTS NODES
         FastAPI --> Prometheus
-        PostgreSQL --> Prometheus
-        MLContainer --> Prometheus
-        Prometheus --> Accuracy
-        Prometheus --> DataBacklog
-        PostgreSQL --> DriftDetection
-        Accuracy --> SmartTrigger
-        DataBacklog --> SmartTrigger
-        DriftDetection --> SmartTrigger
-        SmartTrigger --> RetrainTrigger
-        RetrainTrigger -.->|only if needed| MLDAG
-    end
-    
-    %% Real-time Serving
-    subgraph RealTimeServing ["Real-time Serving"]
-        FastAPI[FastAPI Container]
-        RealTimeRequests[Real Time Requests]
-        RealTimePredictions[Real Time Predictions]
-        
         RealTimeRequests --> FastAPI
         FastAPI --> RealTimePredictions
-    end
+        MLContainer --> FastAPI
     
-    %% Visualization
+    end
+
+
+    %% Visualization [V]
     subgraph Visualization ["Visualization"]
-        Grafana[Grafana Container]
         
+        %% V NODE
+        Grafana["`**Grafana**
+        _(container)_`"]
+        SpacerV[ ]:::hidden
+        
+        %% V EDGE
         Prometheus --> Grafana
     end
-    
-    %% Styling
-    classDef container fill:#e1f5fe
-    classDef storage fill:#f3e5f5
-    classDef service fill:#e8f5e8
-    classDef monitoring fill:#fff3e0
-    
+
+    %% LAYOUT: LOCK FLOWCHART
+    SpacerO ~~~ SpacerDI & SpacerML
+    SpacerDI ~~~ SpacerMaT
+    SpacerML ~~~ SpacerMaT
+    SpacerML ~~~ SpacerRTS
+    SpacerML ~~~ SpacerV
+
+
+    %% STYLING
+
+    %% Apply default styles to ALL nodes
+    classDef default fill:#FFF,stroke:#333,stroke-width:2px;
+
+    %% Apply default styles to ALL edges
+    linkStyle default stroke:#999,stroke-width:2px,color:black;
+
     class MLContainer,FastAPI,Airflow,Prometheus,Grafana container
     class PostgreSQL,MinIO,MLflow storage
     class DataDAG,MLDAG service
     class Accuracy,DataBacklog,DriftDetection monitoring
+    class SpacerO,SpacerDI,SpacerMaT,SpacerML,SpacerRTS,SpacerV spacer
+
+    classDef container fill:#E0F2FE,stroke:#0369A1,stroke-width:2px
+    classDef storage fill:#FEE2E2,stroke:#DC2626,stroke-width:2px
+    classDef service fill:#ECFDF5,stroke:#059669,stroke-width:2px
+    classDef monitoring fill:#FEF3C7,stroke:#D97706,stroke-width:2px
+    classDef spacer fill:#FFF,stroke:#FFF,stroke-width:0px
+    

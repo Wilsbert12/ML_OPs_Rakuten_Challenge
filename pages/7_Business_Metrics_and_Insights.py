@@ -4,11 +4,11 @@ from containers.rakuten_st.streamlit_utils import add_pagination_and_footer
 
 st.set_page_config(
     page_title="MAY25 BDS // Business Metrics and Insights",
-    page_icon="images/logos/rakuten-favicon.ico",
+    page_icon="containers/rakuten_st/images/logos/rakuten-favicon.ico",
     layout="wide",
 )
 
-st.progress(7 / 8)
+st.progress(7 / 9)
 st.title("Business Metrics and Insights ")
 
 # Create tabs for the three main sections

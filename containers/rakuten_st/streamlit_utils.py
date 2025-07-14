@@ -4,11 +4,12 @@ PAGE_SEQUENCE = [
     {"name": "1. Homepage", "path": "pages/1_Homepage.py"},
     {"name": "2. Team Presentation", "path": "pages/2_Team_Presentation.py"},
     {"name": "3. Flowcharts", "path": "pages/3_Flowcharts.py"},
-    {"name": "4. Key Focus Areas", "path": "pages/4_Key_Focus_Areas.py"},
-    {"name": "5. FastAPI Demo", "path": "pages/5_FastAPI_Demo.py"},
+    {"name": "4. Airflow", "path": "pages/4_Airflow.py"},
+    {"name": "5. FastAPI", "path": "pages/5_FastAPI_Demo.py"},
     {"name": "6. Monitoring and Operations", "path": "pages/6_Monitoring_and_Operations.py"},
     {"name": "7. Business Metrics and Insights", "path": "pages/7_Business_Metrics_and_Insights.py"},
-    {"name": "8: Future Improvements", "path": "pages/8_Future_Improvements.py"}
+    {"name": "8: Future Improvements", "path": "pages/8_Future_Improvements.py"},
+    {"name": "9. Appendix", "path": "pages/9_Appendix.py"},
 ]
 
 def add_pagination_and_footer(current_page_path):

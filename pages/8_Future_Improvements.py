@@ -4,11 +4,11 @@ from containers.rakuten_st.streamlit_utils import add_pagination_and_footer
 
 st.set_page_config(
     page_title="MAY25 BDS // Future Improvements",
-    page_icon="images/logos/rakuten-favicon.ico",
+    page_icon="containers/rakuten_st/images/logos/rakuten-favicon.ico",
     layout="wide",
 )
 
-st.progress(8 / 8)
+st.progress(8 / 9)
 st.title("Future Improvements")
 
 # Replace content after st.title("Future Improvements") with:

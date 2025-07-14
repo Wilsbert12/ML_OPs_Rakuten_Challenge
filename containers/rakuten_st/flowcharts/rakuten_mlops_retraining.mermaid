@@ -1,0 +1,43 @@
+graph TD
+    %% Data Ingestion
+    Start[New Product Data] --> DataStorage[Store in Database]
+    
+    %% Immediate Training Decision
+    DataStorage --> TrainingTrigger{Training Trigger?<br/>- Enough data? 2k+ samples<br/>- Accuracy below threshold?<br/>- Drift above threshold?}
+    TrainingTrigger -->|Yes| FeatureEngineering[Feature Engineering<br/>Text Preprocessing]
+    TrainingTrigger -->|No| WaitingState[Monitor & Wait]
+    
+    %% Model Development Cycle
+    FeatureEngineering --> ModelTraining[Model Training<br/>GridSearchCV]
+    ModelTraining --> ModelEvaluation[Model Evaluation<br/>F1 Score: 73.4%]
+    ModelEvaluation --> ModelRegistry[Save to MLflow]
+    
+    %% Deployment Decision
+    ModelRegistry --> DeploymentDecision{Better than<br/>Current Model?}
+    DeploymentDecision -->|Yes| ModelDeployment[Deploy New Model]
+    DeploymentDecision -->|No| KeepCurrent[Keep Current Model]
+    
+    %% Production Serving
+    ModelDeployment --> ProductionAPI[Production FastAPI]
+    KeepCurrent --> ProductionAPI
+    ProductionAPI --> RealTimePredictions[Real-time Predictions]
+    
+    %% Business Value
+    RealTimePredictions --> BusinessValue[Business Value<br/>- Automated Classification<br/>- Improved User Experience<br/>- Reduced Manual Work]
+    
+    %% Monitoring and Feedback Loop
+    RealTimePredictions --> MonitoringDashboard[Grafana Monitoring]
+    MonitoringDashboard --> PerformanceMetrics[Track Performance<br/>- API Usage<br/>- Prediction Accuracy<br/>- System Health]
+    
+    %% Monitoring is continuous - no further connections needed
+    
+    %% Styling
+    classDef process fill:#e3f2fd
+    classDef decision fill:#fff3e0
+    classDef storage fill:#f3e5f5
+    classDef value fill:#e8f5e8
+    
+    class FeatureEngineering,ModelTraining,ModelEvaluation,ModelDeployment process
+    class TrainingTrigger,DeploymentDecision decision
+    class DataStorage,ModelRegistry storage
+    class BusinessValue,RealTimePredictions,MonitoringDashboard value

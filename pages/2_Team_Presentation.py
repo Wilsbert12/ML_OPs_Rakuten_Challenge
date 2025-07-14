@@ -6,15 +6,15 @@ from containers.rakuten_st.streamlit_utils import add_pagination_and_footer
 # Page configuration
 st.set_page_config(
     page_title="MAY25 BDS // Team Presentation",
-    page_icon="images/logos/rakuten-favicon.ico",
+    page_icon="containers/rakuten_st/images/logos/rakuten-favicon.ico",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # Logo display
-st.logo(image="images/logos/rakuten-logo-red-wide.svg", size="large", icon_image="images/logos/rakuten-logo-red-square.svg")
+st.logo(image="containers/rakuten_st/images/logos/rakuten-logo-red-wide.svg", size="large", icon_image="containers/rakuten_st/images/logos/rakuten-logo-red-square.svg")
 
-st.progress(2 / 8)
+st.progress(2 / 9)
 st.title("Team Presentation")
 
 # Create three columns for team members
@@ -22,7 +22,7 @@ tp_col1, tp_col2, tp_col3, tp_col4 = st.columns(4)  # tp_ as in "team presentati
 
 
 with tp_col1:
-    st.image("images/profile_pictures/marie_erno-moller.png", use_container_width=True)
+    st.image("containers/rakuten_st/images/profile_pictures/marie_erno-moller.png", use_container_width=True)
     st.info("Marie Ernø-Møller")
 
     # Display primary contribution information directly
@@ -55,7 +55,7 @@ with tp_col1:
 
 
 with tp_col2:
-    st.image("images/profile_pictures/peter_stieg.jpg", use_container_width=True)
+    st.image("containers/rakuten_st/images/profile_pictures/peter_stieg.jpg", use_container_width=True)
     st.info("Peter Stieg")
 
     # Display primary contribution information directly
@@ -89,7 +89,7 @@ with tp_col2:
 
 
 with tp_col3:
-    st.image("images/profile_pictures/qi_bao.png", use_container_width=True)
+    st.image("containers/rakuten_st/images/profile_pictures/qi_bao.png", use_container_width=True)
     st.info("Qi Bao")
 
     # Display primary contribution information directly
@@ -121,7 +121,7 @@ with tp_col3:
 
 
 with tp_col4:
-    st.image("images/profile_pictures/robert_wilson.jpg", use_container_width=True)
+    st.image("containers/rakuten_st/images/profile_pictures/robert_wilson.jpg", use_container_width=True)
     st.info("Robert Wilson")
 
     # Display primary contribution information directly

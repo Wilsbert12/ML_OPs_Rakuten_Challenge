@@ -11,8 +11,6 @@
             _(container)_`"]
             
             SpacerO[ ]:::hidden
-
-
         end
 
 
@@ -37,9 +35,9 @@
 
             %% DI EDGES 
             DataDAG -. "`_batch upload of 2k products every 15min_`" .-> DataDAG
-            DataDAG --> PostgreSQL & MinIO
+            DataDAG --> PostgreSQL
+            DataDAG -. "`_(currently not used)_`" .-> MinIO
             Airflow --> DataDAG
-
         end
         
 
@@ -77,8 +75,6 @@
             DataBacklog --> SmartTrigger
             DriftDetection --> SmartTrigger
             SmartTrigger --> RetrainTrigger
-
-
         end
 
 
@@ -105,7 +101,6 @@
             SpacerML[ ]:::hidden
             
 
-
             %% ML EDGES
 
             Airflow --> MLDAG
@@ -114,11 +109,8 @@
             Training --> Evaluation
             Evaluation --> MLflow
             MLflow -- "`_current best model_`" --> MLContainer
-
             MLflow --> PostgreSQL
         end
-
-
 
 
         %% REAL-TIME SERVING [RTS]

@@ -478,6 +478,28 @@ services:
       - /sys:/host/sys:ro
       - /:/rootfs:ro
 
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile.streamlit
+    container_name: rakuten-streamlit
+    ports:
+      - "8501:8501"
+    networks:
+      - default
+    volumes:
+      - .:/app
+    depends_on:
+      - fastapi
+      - prometheus
+      - grafana
+    environment:
+      - PYTHONPATH=/app
+      - FASTAPI_URL=http://fastapi:8000
+      - PROMETHEUS_URL=http://prometheus:9090
+      - GRAFANA_URL=http://grafana:3000
+    restart: unless-stopped
+
 
 volumes:
   postgres-db-volume:

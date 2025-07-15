@@ -2,18 +2,25 @@
 
 
         %% ORCHESTRATION [O]
-        subgraph ORCHESTRATION ["`**ORCHESTRATION**`"]
+        
+        subgraph Orchestration ["`ORCHESTRATION`"]
+
             %% O NODE
+
             Airflow["`**Airflow**
             _(container)_`"]
+            
             SpacerO[ ]:::hidden
+
+
         end
 
 
 
 
         %% DATA INGESTION [DI]
-        subgraph DataIngestion ["`**DATA INGESTION**`"]
+        subgraph DataIngestion ["`DATA INGESTION`"]
+
             
             %% DI NODES
             
@@ -38,9 +45,11 @@
 
 
         %% MONITORING & TRIGGERING [MaT]
-        subgraph MonitoringTriggering ["`**MONITORING & TRIGGERING**`"]
+
+        subgraph MonitoringTriggering ["`MONITORING & TRIGGERING`"]
 
             %% MaT NODES
+
             Prometheus["`**Prometheus**
             _(container)_`"]
 
@@ -60,24 +69,28 @@
 
 
             %% MaT EDGES
-            PostgreSQL --> Prometheus
-            Prometheus --> Accuracy
-            Prometheus --> DataBacklog
+
+            PostgreSQL --> Accuracy & DataBacklog
+
             PostgreSQL --> DriftDetection
             Accuracy --> SmartTrigger
             DataBacklog --> SmartTrigger
             DriftDetection --> SmartTrigger
             SmartTrigger --> RetrainTrigger
-            %%RetrainTrigger -. "`_only if necessary_`" .-> MLDAG
+
 
         end
 
 
         %% MACHINE LEARNING [ML]
-        subgraph MachineLearning ["`**MACHINE LEARNING**`"]
 
-            %% MT NODES
+        subgraph MachineLearning ["`MACHINE LEARNING`"]
+
+            %% ML NODES
+
             MLDAG["`**ML Pipeline DAG**`"]
+
+
             MLContainer["`**Model Training**
             _(container)_`"]
             
@@ -92,78 +105,91 @@
             SpacerML[ ]:::hidden
             
 
-            %% MT NODES
+
+            %% ML EDGES
+
             Airflow --> MLDAG
             MLDAG --> MLContainer
             MLContainer --> Prometheus & Training
             Training --> Evaluation
             Evaluation --> MLflow
             MLflow -- "`_current best model_`" --> MLContainer
+
+            MLflow --> PostgreSQL
         end
 
 
 
-    %% REAL-TIME SERVING [RTS]
-    subgraph RealTimeServing ["`**REAL-TIME SERVING**`"]
 
-        %% RTS NODES
+        %% REAL-TIME SERVING [RTS]
+        subgraph RealTimeServing ["`REAL-TIME SERVING`"]
 
-        FastAPI["`**FastAPI**
-        _(container)_`"]
+            %% RTS NODES
 
-        RealTimeRequests["`Real Time Requests`"]
+            FastAPI["`**FastAPI**
+            _(container)_`"]
+
+            RealTimeRequests["`Real Time Requests`"]
+            
+            RealTimePredictions["`Real Time Predictions`"]
+
+            SpacerRTS[ ]:::hidden
+            
+
+            %% RTS EDGES
+            FastAPI --> Prometheus
+            RealTimeRequests --> FastAPI
+            FastAPI --> RealTimePredictions
+            MLContainer --> FastAPI
+        end
+
+
+        %% Visualization [V]
+        subgraph Visualization ["Visualization"]
+            
+            %% V NODES
+
+            Grafana["`**Grafana**
+            _(container)_`"]
+
+            SpacerV[ ]:::hidden
+            
+
+            %% V EDGE
+            Prometheus --> Grafana
+        end
+
+        %% LAYOUT: LOCK FLOWCHART
+        SpacerO ~~~ SpacerDI & SpacerML
+        SpacerDI ~~~ SpacerMaT
+        SpacerML ~~~ SpacerMaT
+        SpacerML ~~~ SpacerRTS
+        SpacerML ~~~ SpacerV
+
+        %% LAYOUT: EDGES BETWEEN COMPONENTS
+        RetrainTrigger -. "`_only if necessary_`" .-> MLDAG
+
+
+        %% STYLING
+
+        %% Apply default styles to ALL nodes
+        classDef default fill:#FFF,stroke:#333,stroke-width:2px;
+
+        %% Apply default styles to ALL edges
+        linkStyle default stroke:#999,stroke-width:2px,color:black;
+
+        class Orchestration,Visualization invisibleSubgraph
+        class MLContainer,FastAPI,Airflow,Prometheus,Grafana container
+        class PostgreSQL,MinIO,MLflow storage
+        class DataDAG,MLDAG service
+        class Accuracy,DataBacklog,DriftDetection monitoring
+        class SpacerO,SpacerDI,SpacerMaT,SpacerML,SpacerRTS,SpacerV spacer
+
+        classDef invisibleSubgraph fill:transparent,stroke:none,stroke-width:0px;
+        classDef container fill:#E0F2FE,stroke:#0369A1,stroke-width:2px
+        classDef storage fill:#FEE2E2,stroke:#DC2626,stroke-width:2px
+        classDef service fill:#ECFDF5,stroke:#059669,stroke-width:2px
+        classDef monitoring fill:#FEF3C7,stroke:#D97706,stroke-width:2px
+        classDef spacer fill:#FFF,stroke:#FFF,stroke-width:0px
         
-        RealTimePredictions["`Real Time Predictions`"]
 
-        SpacerRTS[ ]:::hidden
-        
-
-        %% RTS NODES
-        FastAPI --> Prometheus
-        RealTimeRequests --> FastAPI
-        FastAPI --> RealTimePredictions
-        MLContainer --> FastAPI
-    
-    end
-
-
-    %% Visualization [V]
-    subgraph Visualization ["Visualization"]
-        
-        %% V NODE
-        Grafana["`**Grafana**
-        _(container)_`"]
-        SpacerV[ ]:::hidden
-        
-        %% V EDGE
-        Prometheus --> Grafana
-    end
-
-    %% LAYOUT: LOCK FLOWCHART
-    SpacerO ~~~ SpacerDI & SpacerML
-    SpacerDI ~~~ SpacerMaT
-    SpacerML ~~~ SpacerMaT
-    SpacerML ~~~ SpacerRTS
-    SpacerML ~~~ SpacerV
-
-
-    %% STYLING
-
-    %% Apply default styles to ALL nodes
-    classDef default fill:#FFF,stroke:#333,stroke-width:2px;
-
-    %% Apply default styles to ALL edges
-    linkStyle default stroke:#999,stroke-width:2px,color:black;
-
-    class MLContainer,FastAPI,Airflow,Prometheus,Grafana container
-    class PostgreSQL,MinIO,MLflow storage
-    class DataDAG,MLDAG service
-    class Accuracy,DataBacklog,DriftDetection monitoring
-    class SpacerO,SpacerDI,SpacerMaT,SpacerML,SpacerRTS,SpacerV spacer
-
-    classDef container fill:#E0F2FE,stroke:#0369A1,stroke-width:2px
-    classDef storage fill:#FEE2E2,stroke:#DC2626,stroke-width:2px
-    classDef service fill:#ECFDF5,stroke:#059669,stroke-width:2px
-    classDef monitoring fill:#FEF3C7,stroke:#D97706,stroke-width:2px
-    classDef spacer fill:#FFF,stroke:#FFF,stroke-width:0px
-    

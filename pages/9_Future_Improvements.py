@@ -1,4 +1,4 @@
-# pages/8_Future_Improvements
+# pages/9_Future_Improvements
 import streamlit as st
 from containers.rakuten_st.streamlit_utils import add_pagination_and_footer
 
@@ -61,4 +61,4 @@ st.markdown("""
 
 # Pagination and footer
 st.markdown("---")
-add_pagination_and_footer("pages/8_Future_Improvements.py")
+add_pagination_and_footer("pages/9_Future_Improvements.py")

@@ -1,4 +1,4 @@
-# 3_Flowcharts.py
+# 5_Airflow.py
 import streamlit as st
 from containers.rakuten_st.streamlit_utils import add_pagination_and_footer
 
@@ -8,7 +8,7 @@ st.set_page_config(
     layout="wide",
 )
 
-st.progress(4 / 9)
+st.progress(5 / 10)
 st.title("Airflow")
 
 # Airflow content
@@ -61,4 +61,4 @@ with col_img2:
 
 # Pagination and footer
 st.markdown("---")
-add_pagination_and_footer("pages/4_Airflow.py")
+add_pagination_and_footer("pages/5_Airflow.py")

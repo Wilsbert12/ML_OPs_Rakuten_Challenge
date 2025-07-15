@@ -1,4 +1,4 @@
-# pages/9_Appendix.py
+# pages/10_Appendix.py
 import streamlit as st
 from containers.rakuten_st.streamlit_utils import add_pagination_and_footer
 
@@ -250,4 +250,4 @@ with custom_image_tab:
     
 # Pagination and footer
 st.markdown("---")
-add_pagination_and_footer("pages/9_Appendix.py")
+add_pagination_and_footer("pages/10_Appendix.py")

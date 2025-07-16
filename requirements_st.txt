@@ -1,0 +1,9 @@
+# Streamlit App Dependencies
+# Only packages needed for UI and HTTP requests
+
+# Core Streamlit
+streamlit>=1.8.0
+streamlit_mermaid>=0.3.0
+
+# HTTP requests to other containers
+requests>=2.31.0

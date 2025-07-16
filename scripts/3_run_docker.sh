@@ -14,6 +14,9 @@ echo "PROJECT_ROOT=$PROJECT_ROOT" >> "$ENV_FILE"
 echo "Building Docker image for Rakuten ML..."
 docker build -t rakuten-ml "$PROJECT_ROOT/containers/rakuten-ml"
 
+echo "Creating required directories for FastAPI container..."
+mkdir -p "$PROJECT_ROOT/processed_data" "$PROJECT_ROOT/models"
+
 cd "$PROJECT_ROOT"
 echo "Starting Docker Compose services..."
-docker compose up -d
+docker compose -p rakuten_project up -d

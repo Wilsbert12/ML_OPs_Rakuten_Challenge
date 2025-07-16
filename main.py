@@ -3,18 +3,18 @@ from pydantic import BaseModel
 from typing import Dict, Any, List
 import logging
 import mlflow
-import mlflow.pyfunc
 import pandas as pd
-import os
-import subprocess
-import json as json_lib
-import psutil
+
+# Add ML container path to enable importing functions for prediction and public IP retrieval
 import sys
 sys.path.append('/app/containers/rakuten-ml')
 from predict import predict_single
+from get_public_ip import get_public_ip
 
 # Set MLflow Tracking URI
-mlflow.set_tracking_uri("http://mlflow:5000")  
+public_ip = get_public_ip()
+mlflow.set_tracking_uri("http://mlflow:5000")
+public_url = f"http://{public_ip}:5001"
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -39,8 +39,8 @@ class TrainingResponse(BaseModel):
     metrics: Dict[str, float] = {}
 
 class PredictionRequest(BaseModel):
-    title: str = ""
-    description: str = ""
+    title: str = "Piscine Intex Prism"
+    description: str = "Piscine avec liner renforcé de dernière génération structure renforcée en acier"
     model_id: str = None
 
 class PredictionResponse(BaseModel):
@@ -56,7 +56,7 @@ training_status = {"is_training": False, "last_result": None}
 
 @app.get("/")
 async def root():
-    return {"message": "Rakuten ML API is running", "status": "healthy"}
+    return {"message": "Rakuten Product Category API is running", "status": "healthy"}
 
 @app.get("/health")
 async def health_check():
@@ -65,20 +65,27 @@ async def health_check():
         "training_active": training_status["is_training"],
         "services": {
             "api": "running",
-            "mlflow_tracking": mlflow.get_tracking_uri()
+            "mlflow_tracking (internal)": mlflow.get_tracking_uri(),
+            "mlflow_tracking (public)": public_url,
         }
     }
 
 @app.get("/models/")
 async def list_models():
     from mlflow.tracking import MlflowClient
-    client = MlflowClient()
-    models = client.list_registered_models()
-    model_names = [m.name for m in models]
-    return {
-        "models": model_names,
-        "message": "Model registry from MLflow tracking server"
-    }
+    client = MlflowClient(tracking_uri="http://mlflow:5000") 
+    try:
+        models = client.search_registered_models()
+        model_names = [m.name for m in models]
+        return {
+            "models": model_names,
+        "   message": "Model registry from MLflow tracking server"
+        }
+    except Exception as e:
+        return {
+            "models": [],
+            "message": f"MLflow connection error: {str(e)}"
+        }
 
 @app.post("/training/", response_model=TrainingResponse)
 async def trigger_training(request: TrainingRequest, background_tasks: BackgroundTasks):
@@ -90,7 +97,6 @@ async def trigger_training(request: TrainingRequest, background_tasks: Backgroun
         logger.info("Starting training...")
 
         # For now, simulate a training run and log a dummy model
-        import tempfile
         from sklearn.linear_model import LogisticRegression
 
         # Dummy data

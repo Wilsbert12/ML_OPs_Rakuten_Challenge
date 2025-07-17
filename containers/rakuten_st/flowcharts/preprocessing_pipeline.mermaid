@@ -1,0 +1,65 @@
+graph TD
+    subgraph Example ["TEXT EXAMPLE"]
+        J["<b>ORIGINAL DATA</b><br/><b>designation</b>: Smartphone Samsung Galaxy S21<br/><b>description</b>: ecran AMOLED 6.2 pouces. Appareil photo 64MP. Batterie 4000mAh et charge rapide!<br/><b>prdtypecode</b>: 2280"]
+        K["<b>COMBINED TEXT</b><br/>Smartphone Samsung Galaxy S21 ecran AMOLED 6.2 pouces. Appareil photo 64MP. Batterie 4000mAh et charge rapide!"]
+        L["<b>CREATE TEXT VERSIONS</b>"]
+        M["<b>text_raw</b>:<br/>Smartphone Samsung Galaxy S21 ecran AMOLED 6.2 pouces. Appareil photo 64MP. Batterie 4000mAh et charge rapide!"]
+        N["<b>text_classical</b>:<br/>smartphone samsung galaxy s21 ecran amoled 62 pouces appareil photo 64mp batterie 4000mah charge rapide<br/>(lowercase, punctuation removed, stopword 'et' removed)"]
+        O["<b>text_bert</b>:<br/>smartphone samsung galaxy s21 ecran amoled 6.2 pouces. appareil photo 64mp. batterie 4000mah et charge rapide!<br/>(lowercase, punctuation preserved, stopwords preserved)"]
+        P["<b>TF-IDF FEATURES</b>:<br/><b>smartphone</b>: 0.234<br/><b>samsung</b>: 0.156<br/><b>galaxy</b>: 0.198<br/><b>charge rapide</b>: 0.203"]
+        Q["Output Files Saved"]
+        R["READY FOR ML TRAINING<br/>1000-dimensional TF-IDF vector<br/>Category: 2280 (Electronics)"]
+    end
+
+    %% TEXT EXAMPLES EDGES
+    A --> B
+    B --> C
+    C --> D & E & F
+    E --> G
+    G --> H
+    H --> I
+
+    subgraph Process ["PROCESS"]
+        A["<b>PostgreSQL DATABASE</b><br/>x_train: id, designation, description<br/>y_train: id, prdtypecode"]
+        B["<b>DataFrame PROCESSING</b><br/>Fill NaN values<br/>Combine designation + description"]
+        C["<b>CREATE TEXT VERSIONS</b>"]
+        D["<b>text_raw</b><br/>Minimal Cleaning"]
+        E["<b>text_classical</b><br/>Heavy Preprocessing<br/>Remove punctuation<br/>French stopwords"]
+        F["<b>text_bert</b><br/>Basic Cleaning<br/>Future models"]
+        G["<b>TF-IDF FEATURE EXTRACTION</b><br/>From text_classical<br/>1000 features"]
+        H["<b>SAVE PROCESSED DATA</b><br/>- X_features.npz (TF-IDF matrix)<br/>- y_target.npy (labels)<br/>- processed_text.csv (all text versions)<br/>- vectorizer.pkl (for inference)<br/>- metadata.json (processing info)<br/>- latest_preprocessing.json (symlink)"]
+        I["<b>READY FOR ML TRAINING</b>"]
+    end
+
+    %% PROCESS NODES
+    J --> K
+    K --> L
+    L --> M & N & O
+    N --> P
+    P --> Q
+    Q --> R
+
+    %% Apply default styles to ALL nodes
+    classDef default fill:#FFF,stroke:#333,stroke-width:2px;
+
+    %% Apply default styles to ALL edges
+    linkStyle default stroke:#999,stroke-width:2px,color:black;
+
+    %% INVISIBLE SUBRAPHS
+    classDef invisibleSubgraph fill:transparent,stroke:none,stroke-width:0px;
+    class Example,Process invisibleSubgraph
+
+    classDef storage fill:#FEE2E2,stroke:#DC2626,stroke-width:2px
+    classDef processing fill:#FFF3E0,stroke:#FFA000,stroke-width:2px
+    classDef textVersion fill:#ECFDF5,stroke:#28A745,stroke-width:2px
+    classDef feature fill:#f8e8f8,stroke:#6f42c1,stroke-width:2px
+    classDef output fill:#e8e8f8,stroke:#6c757d,stroke-width:2px
+    classDef ready fill:#d4edda,stroke:#28a745,stroke-width:2px
+    classDef example fill:#f0f8ff,stroke:#87ceeb,stroke-width:2px
+
+    class A,J storage
+    class B,C,K,L processing
+    class D,E,F,M,N,O textVersion
+    class G,P feature
+    class H,Q output
+    class I,R ready

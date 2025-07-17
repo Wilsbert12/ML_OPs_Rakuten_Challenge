@@ -3,12 +3,12 @@ import streamlit as st
 from containers.rakuten_st.streamlit_utils import add_pagination_and_footer
 
 st.set_page_config(
-    page_title="MAY25 BDS // Business Metrics and Insights",
+    page_title="MAY25 BMLOPS // Business Metrics and Insights",
     page_icon="containers/rakuten_st/images/logos/rakuten-favicon.ico",
     layout="wide",
 )
 
-st.progress(7 / 9)
+st.progress(9 / 10)
 st.title("Business Metrics and Insights ")
 
 # Create tabs for the three main sections
@@ -82,4 +82,4 @@ with tab3:
 
 # Pagination and footer
 st.markdown("---")
-add_pagination_and_footer("pages/8_Business_Metrics_and_Insights.py")
+add_pagination_and_footer("pages/9_Business_Metrics_and_Insights.py")

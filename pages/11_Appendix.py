@@ -1,4 +1,4 @@
-# pages/10_Appendix.py
+# pages/11_Appendix.py
 import streamlit as st
 from containers.rakuten_st.streamlit_utils import add_pagination_and_footer
 
@@ -135,7 +135,6 @@ volume_df = pd.DataFrame(volume_data)
 dag_df = pd.DataFrame(dag_data)
 custom_images_df = pd.DataFrame(custom_images_data)
 
-st.progress(9 / 9)
 st.title("Appendix")
 
 # Project Outline content
@@ -250,4 +249,4 @@ with custom_image_tab:
     
 # Pagination and footer
 st.markdown("---")
-add_pagination_and_footer("pages/10_Appendix.py")
+add_pagination_and_footer("pages/11_Appendix.py")

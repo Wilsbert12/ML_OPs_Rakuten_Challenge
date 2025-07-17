@@ -3,12 +3,12 @@
 
         %% ORCHESTRATION [O]
         
-        subgraph Orchestration ["`ORCHESTRATION`"]
+        subgraph Orchestration ["ORCHESTRATION"]
 
             %% O NODE
 
-            Airflow["`**Airflow**
-            _(container)_`"]
+            Airflow["<b>Airflow</b>
+            <em>(container)</em>"]
             
             SpacerO[ ]:::hidden
         end
@@ -17,26 +17,26 @@
 
 
         %% DATA INGESTION [DI]
-        subgraph DataIngestion ["`DATA INGESTION`"]
+        subgraph DataIngestion ["DATA INGESTION"]
 
             
             %% DI NODES
             
-            DataDAG["`**Data Preparation DAG**`"]
+            DataDAG["<b>Data Preparation DAG</b>"]
             
-            PostgreSQL[("`**PostgreSQL**
-            Database _(container)_`")]
+            PostgreSQL[("<b>PostgreSQL</b>
+            Database <em>(container)</em>")]
             
-            MinIO[("`**MinIO**
-            Object Storage _(container)_`")]
+            MinIO[("<b>MinIO</b>
+            Object Storage <em>(container)</em>")]
 
             SpacerDI[ ]:::hidden
             
 
             %% DI EDGES 
-            DataDAG -. "`_batch upload of 2k products every 15min_`" .-> DataDAG
+            DataDAG -. "<em>batch upload of 2k products every 15min</em>" .-> DataDAG
             DataDAG --> PostgreSQL
-            DataDAG -. "`_(currently not used)_`" .-> MinIO
+            DataDAG -. "<em>(currently not used)</em>" .-> MinIO
             Airflow --> DataDAG
         end
         
@@ -44,24 +44,24 @@
 
         %% MONITORING & TRIGGERING [MaT]
 
-        subgraph MonitoringTriggering ["`MONITORING & TRIGGERING`"]
+        subgraph MonitoringTriggering ["MONITORING & TRIGGERING"]
 
             %% MaT NODES
 
-            Prometheus["`**Prometheus**
-            _(container)_`"]
+            Prometheus["<b>Prometheus</b>
+            <em>(container)</em>"]
 
-            Accuracy["`Accuracy Monitoring`"]
+            Accuracy["Accuracy Monitoring"]
 
-            DataBacklog["`Data Backlog`"]
+            DataBacklog["Data Backlog"]
 
-            DriftDetection["`Drift Detection Evidently`"]
+            DriftDetection["Drift Detection Evidently"]
 
-            SmartTrigger["`**Smart Trigger Mechanism**
+            SmartTrigger["<b>Smart Trigger Mechanism</b>
             1. F1 < 0.7
-            2. Backlog >= 10k`"]
+            2. Backlog >= 10k"]
             
-            RetrainTrigger{"`Retraining Trigger`"}
+            RetrainTrigger{"Retraining Trigger"}
 
             SpacerMaT[ ]:::hidden
 
@@ -80,26 +80,26 @@
 
         %% MACHINE LEARNING [ML]
 
-        subgraph MachineLearning ["`MACHINE LEARNING`"]
+        subgraph MachineLearning ["MACHINE LEARNING"]
 
             %% ML NODES
 
-            MLDAG["`**ML Pipeline DAG**`"]
+            MLDAG["<b>ML Pipeline DAG</b>"]
 
 
-            MLContainer["`**Model Training**
-            _(container)_`"]
+            MLContainer["<b>Model Training</b>
+            <em>(container)</em>"]
             
-            Training["`**GridSearchCV**
-            Model Training`"]
+            Training["<b>GridSearchCV</b>
+            Model Training"]
             
-            Evaluation["`Model Evaluation`"]
+            Evaluation["Model Evaluation"]
             
-            MLflow[("`**MLflow**
-            Model Registry _(container)_`")]
+            MLflow[("<b>MLflow</b>
+            Model Registry <em>(container)</em>")]
 
             SpacerML[ ]:::hidden
-            
+                        
 
             %% ML EDGES
 
@@ -108,22 +108,22 @@
             MLContainer --> Prometheus & Training
             Training --> Evaluation
             Evaluation --> MLflow
-            MLflow -- "`_current best model_`" --> MLContainer
+            MLflow -- "<em>current best model</em>" --> MLContainer
             MLflow --> PostgreSQL
         end
 
 
         %% REAL-TIME SERVING [RTS]
-        subgraph RealTimeServing ["`REAL-TIME SERVING`"]
+        subgraph RealTimeServing ["REAL-TIME SERVING"]
 
             %% RTS NODES
 
-            FastAPI["`**FastAPI**
-            _(container)_`"]
+            FastAPI["<b>FastAPI</b>
+            <em>(container)</em>"]
 
-            RealTimeRequests["`Real Time Requests`"]
+            RealTimeRequests["Real Time Requests"]
             
-            RealTimePredictions["`Real Time Predictions`"]
+            RealTimePredictions["Real Time Predictions"]
 
             SpacerRTS[ ]:::hidden
             
@@ -137,12 +137,12 @@
 
 
         %% Visualization [V]
-        subgraph Visualization ["Visualization"]
+        subgraph Visualization ["VISUALIZATION"]
             
             %% V NODES
 
-            Grafana["`**Grafana**
-            _(container)_`"]
+            Grafana["<b>Grafana</b>
+            <em>(container)</em>"]
 
             SpacerV[ ]:::hidden
             
@@ -159,7 +159,7 @@
         SpacerML ~~~ SpacerV
 
         %% LAYOUT: EDGES BETWEEN COMPONENTS
-        RetrainTrigger -. "`_only if necessary_`" .-> MLDAG
+        RetrainTrigger -. "<em>only if necessary</em>" .-> MLDAG
 
 
         %% STYLING

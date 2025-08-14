@@ -5,7 +5,7 @@ from containers.rakuten_st.streamlit_utils import add_pagination_and_footer
 
 # Page configuration
 st.set_page_config(
-    page_title="MAY25 BDS // Team Presentation",
+    page_title="MAY25 BMLOPS // Team Presentation",
     page_icon="containers/rakuten_st/images/logos/rakuten-favicon.ico",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -14,7 +14,7 @@ st.set_page_config(
 # Logo display
 st.logo(image="containers/rakuten_st/images/logos/rakuten-logo-red-wide.svg", size="large", icon_image="containers/rakuten_st/images/logos/rakuten-logo-red-square.svg")
 
-st.progress(2 / 9)
+st.progress(2 / 10)
 st.title("Team Presentation")
 
 # Create three columns for team members
@@ -60,9 +60,9 @@ with tp_col2:
 
     # Display primary contribution information directly
     st.write("**Primary Contributions:**")
+    st.write("• Debugging, Testing & Refactoring")
     st.write("• Preprocessing of text data")
     st.write("• Streamlit presentation")
-    st.write("• Refactoring")
 
     with st.expander("… more info"):
         st.markdown(

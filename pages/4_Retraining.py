@@ -5,7 +5,7 @@ from containers.rakuten_st.streamlit_utils import add_pagination_and_footer
 
 
 st.set_page_config(
-    page_title="MAY25 BDS // Retraining",
+    page_title="MAY25 BMLOPS // Retraining",
     page_icon="containers/rakuten_st/images/logos/rakuten-favicon.ico",
     layout="wide",
 )
@@ -13,7 +13,7 @@ st.set_page_config(
 st.progress(4 / 10)
 st.title("Retraining")
 
-with open("containers/rakuten_st/flowcharts/rakuten_mlops_retraining.mermaid", "r") as file:
+with open("containers/rakuten_st/flowcharts/retraining.mermaid", "r") as file:
     retraining_fc = file.read() # _fc as in "_flowchart"
     st_mermaid(retraining_fc, height="auto", pan=True, zoom=True, show_controls=True)
 

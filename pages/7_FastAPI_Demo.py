@@ -1,16 +1,16 @@
-# pages/6_FastAPI_demo.py
+# pages/7_FastAPI_Demo.py
 import streamlit as st
 import requests
 import os
 from containers.rakuten_st.streamlit_utils import add_pagination_and_footer, get_public_ip
 
 st.set_page_config(
-    page_title="MAY25 BDS // FastAPI Demo",
+    page_title="MAY25 BMLOPS // FastAPI Demo",
     page_icon="containers/rakuten_st/images/logos/rakuten-favicon.ico",
     layout="wide",
 )
 
-st.progress(6 / 9)
+st.progress(7 / 10)
 st.title("FastAPI Demonstration")
 
 PUBLIC_IP = get_public_ip()
@@ -42,7 +42,7 @@ with st.form("prediction_form"):
         help="Enter the product description (in French)"
     )
     
-    submitted = st.button("Get Prediction", type="primary")
+    submitted = st.form_submit_button("Get Prediction", type="primary",  use_container_width=True)
 
 if submitted and (title or description):
     with st.spinner("Retrieving prediction..."):
@@ -58,16 +58,17 @@ if submitted and (title or description):
             )
             
             if response.status_code == 200:
-                result = response.json()
-                prediction = result["predictions"][0]
-                
-                # Display main prediction
-                st.metric(
-                    "Predicted Category",
-                    prediction["category"],
-                    f"{prediction['confidence']:.1%} confidence"
-                )
-                
+                with st.expander("**Show** Prediction", expanded=False):
+                    result = response.json()
+                    prediction = result["predictions"][0]
+                    
+                    # Display main prediction
+                    st.metric(
+                        "Predicted Category",
+                        prediction["category"],
+                        f"{prediction['confidence']:.1%} confidence"
+                    )
+                    
                 # Display top 3 predictions
                 if len(prediction["top_3"]) > 1:
                     with st.expander("**Show** Top 3 Predictions", expanded=False):
@@ -75,15 +76,19 @@ if submitted and (title or description):
                             st.write(f"{i}. **{pred['category']}** ({pred['confidence']:.1%})")
 
             else:
-                st.error(f"Prediction failed: {response.status_code}")
-                st.code(response.text)
-                
+                with st.expander("**Show** Error Message", expanded=False):
+                    st.error(f"Prediction failed: {response.status_code}")
+                    st.code(response.text)
+                    
         except requests.exceptions.ConnectionError:
             st.error("Cannot connect to FastAPI service. Is it running?")
         except requests.exceptions.Timeout:
             st.error("Request timed out. The service may be busy.")
         except Exception as e:
             st.error(f"Error: {str(e)}")
+
+# Horizontal line as divider for better layout
+st.divider()
 
 # Interactive API explorer
 st.subheader("API endpoints")
@@ -93,7 +98,7 @@ endpoint = st.selectbox(
     ["/health", "/models/", "/predict/"]
 )
 
-if st.button("Test Endpoint", type="primary"):
+if st.button("Test Endpoint", type="primary", use_container_width=True):
     try:
         if endpoint == "/health":
             response = requests.get(f"{FASTAPI_INT_URL}{endpoint}")
@@ -116,4 +121,4 @@ if st.button("Test Endpoint", type="primary"):
 
 # Pagination and footer
 st.markdown("---")
-add_pagination_and_footer("pages/6_FastAPI_Demo.py")
+add_pagination_and_footer("pages/7_FastAPI_Demo.py")

@@ -6,12 +6,13 @@ PAGE_SEQUENCE = [
     {"name": "2. Team Presentation", "path": "pages/2_Team_Presentation.py"},
     {"name": "3. Architecture", "path": "pages/3_Architecture.py"},
     {"name": "4. Retraining", "path": "pages/4_Retraining.py"},
-    {"name": "5. Airflow", "path": "pages/5_Airflow.py"},
-    {"name": "6. FastAPI", "path": "pages/6_FastAPI_Demo.py"},
-    {"name": "7. Monitoring and Operations", "path": "pages/7_Monitoring_and_Operations.py"},
-    {"name": "8. Business Metrics and Insights", "path": "pages/8_Business_Metrics_and_Insights.py"},
-    {"name": "9. Future Improvements", "path": "pages/9_Future_Improvements.py"},
-    {"name": "10. Appendix", "path": "pages/10_Appendix.py"},
+    {"name": "5. Preprocessing", "path": "pages/5_Preprocessing.py"},
+    {"name": "6. Airflow", "path": "pages/6_Airflow.py"},
+    {"name": "7. FastAPI", "path": "pages/7_FastAPI_Demo.py"},
+    {"name": "8. Monitoring and Operations", "path": "pages/8_Monitoring_and_Operations.py"},
+    {"name": "9. Business Metrics and Insights", "path": "pages/9_Business_Metrics_and_Insights.py"},
+    {"name": "10. Future Improvements", "path": "pages/10_Future_Improvements.py"},
+    {"name": "11. Appendix", "path": "pages/11_Appendix.py"},
 ]
 
 def add_pagination_and_footer(current_page_path):
@@ -46,7 +47,7 @@ def add_pagination_and_footer(current_page_path):
 
     # Copyright line and page indicator
     st.markdown(
-        f"© 2025 // Marie Ernø-Møller, Peter Stieg, Qi Bao, Robert Wilson // [Page {current_index + 1}/{len(PAGE_SEQUENCE)}]"
+        f"© 2025 // Marie Ernø-Møller, Peter Stieg, Qi Bao, Robert Wilson // [Page {current_index + 1}/{len(PAGE_SEQUENCE) - 1}]"
     )
 
 

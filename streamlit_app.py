@@ -17,16 +17,14 @@ business_metrics_and_insights = st.Page("pages/9_Business_Metrics_and_Insights.p
 future_improvements = st.Page("pages/10_Future_Improvements.py", title="10. Future Improvements")
 appendix = st.Page("pages/11_Appendix.py", title="11. Appendix")
 
-# DEV PAGES
-tmp = st.Page("pages/12_tmp.py", title="12. tmp")
 
 # Create navigation with grouped pages
 pg = st.navigation({
     "INTRODUCTION": [home_page, team_presentation],
     "FLOWCHARTS": [architecture, retraining, preprocessing],
     "PROJECT": [airflow, fastapi_demo, 
-                  monitoring_and_operations, business_metrics_and_insights, future_improvements, appendix],
-    "DEV": [tmp]
+                  monitoring_and_operations, business_metrics_and_insights, future_improvements],
+    "MISC": [appendix]
 })
 
 # Run the selected page

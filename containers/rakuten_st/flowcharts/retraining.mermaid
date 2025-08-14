@@ -11,17 +11,17 @@ graph TD
 
     
     %% Immediate Training Decision [ITD]
-    TrainingTrigger{"`**Trigger Training?**
+    TrainingTrigger{"<b>Trigger Training?</b>
     - Sufficient data?
-    _(2k samples)_
+    <em>(10 samples)</em>
     - Accuracy below threshold?
-    _F1 Score vs 73.4%_
-    - Drift above threshold?`"}
+    <em>F1 Score vs 73.4%</em>
+    - Drift above threshold?"}
 
-    FeatureEngineering["`**Feature Engineering**
-    Text Preprocessing`"]
+    FeatureEngineering["<b>Feature Engineering</b>
+    Text Preprocessing"]
 
-    WaitingState["`**Monitor & Wait**`"]
+    WaitingState["<b>Monitor & Wait</b>"]
 
     %% ITD EDGES
     DataStorage --> TrainingTrigger
@@ -31,13 +31,13 @@ graph TD
 
     %% Model Development Cycle [MDC]
 
-    ModelTraining["`**Model Training**
-    GridSearchCV`"]
+    ModelTraining["<b>Model Training</b>
+    GridSearchCV"]
 
-    ModelEvaluation["`**Model Evaluation**
-    F1 Score vs 73.4%`"]
+    ModelEvaluation["<b>Model Evaluation</b>
+    F1 Score vs 73.4%"]
     
-    ModelRegistry["`**Save to MLflow**`"]
+    ModelRegistry["<b>Save to MLflow</b>"]
 
     %% MDC EDGES
     FeatureEngineering --> ModelTraining
@@ -62,7 +62,7 @@ graph TD
 
     %% REAL-TIME SERVING [RTS]
     ProductionAPI["Production FastAPI"]
-    RealTimePredictions["Real-time Predictions"]
+    RealTimePredictions["Real-Time Predictions"]
 
     %% RTS EDGES
     ModelDeployment --> ProductionAPI
@@ -71,10 +71,10 @@ graph TD
 
 
     %% Business Value [BV]
-    BusinessValue["`**Business Value**
+    BusinessValue["<b>Business Value</b>
     - Automated Classification
     - Improved User Experience
-    - Reduced Manual Work`"]
+    - Reduced Manual Work"]
     
     %% BV EDGE
     RealTimePredictions --> BusinessValue
@@ -82,12 +82,12 @@ graph TD
 
     %% Monitoring and Triggering [MaT]
 
-    MonitoringDashboard["`**Grafana Monitoring**`"]
+    MonitoringDashboard["<b>Grafana Monitoring</b>"]
 
-    PerformanceMetrics["`**Track Performance**
+    PerformanceMetrics["<b>Track Performance</b>
     - API Usage
     - Prediction Accuracy
-    - System Health`"]
+    - System Health"]
 
 
     %% MaT EDGES
@@ -103,10 +103,10 @@ graph TD
     linkStyle default stroke:#999,stroke-width:2px,fill:none;
 
     %% Node-specific styling
-    classDef process fill:#E0F2FE,stroke:#007BFF,stroke-width:1.5px;
-    classDef decision fill:#FFF3E0,stroke:#FFA000,stroke-width:1.5px;
-    classDef storage fill:#FEE2E2,stroke:#D32F2F,stroke-width:1.5px;
-    classDef value fill:#ECFDF5,stroke:#28A745,stroke-width:1.5px;
+    classDef process fill:#E0F2FE,stroke:#007BFF,stroke-width:2px;
+    classDef decision fill:#FFF3E0,stroke:#FFA000,stroke-width:2px;
+    classDef storage fill:#FEE2E2,stroke:#D32F2F,stroke-width:2px;
+    classDef value fill:#ECFDF5,stroke:#28A745,stroke-width:2px;
 
     %% Applying classes to specific nodes (grouping for readability)
     class FeatureEngineering,ModelTraining,ModelEvaluation,ModelDeployment process; 

@@ -14,7 +14,7 @@ st.set_page_config(
 # Logo display
 st.logo(image="containers/rakuten_st/images/logos/rakuten-logo-red-wide.svg", size="large", icon_image="containers/rakuten_st/images/logos/rakuten-logo-red-square.svg")
 
-st.progress(1 / 9)
+st.progress(1 / 10)
 st.title("MAY25 BMLOPS // Rakuten")
 
 # Home page content
@@ -29,7 +29,7 @@ st.markdown(
     
     Use the sidebar or pagination to browse through the presentation of the project and the team, ...
     
-    **:material/folder_code: GitHub Repository:** [may25_bds_classification-of-rakuten-e-commerce-products](https://github.com/PeterStieg/may25_bds_classification-of-rakuten-e-commerce-products/)
+    **:material/folder_code: GitHub Repository:** [may25_bmlops_classification-of-rakuten-e-commerce-products](https://github.com/PeterStieg/may25_bmlops_classification-of-rakuten-e-commerce-products/)
     
     """
 )

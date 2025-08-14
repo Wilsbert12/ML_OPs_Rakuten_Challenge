@@ -31,7 +31,7 @@ This page demonstrates real-time interaction with the Rakuten Product Category A
 
 # Demo mode notification
 if DEMO_MODE:
-    st.info("💡 **Demo Mode Active** - Live predictions available when running locally with full backend")
+    st.info("💡 **Demo Mode Active** - Live backend integration has been taken offline due to hosting costs. Full predictions available when running locally with complete MLOps infrastructure.")
 
 st.subheader("Product Prediction")
 

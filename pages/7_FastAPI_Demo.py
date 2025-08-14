@@ -168,7 +168,7 @@ st.info("💡 Live integration works when run locally. Screenshots shown below:"
 try:
     st.image("containers/rakuten_st/images/screenshots/fastapi-swagger.png", 
              caption="FastAPI Interactive Documentation (Swagger UI)",
-             use_column_width=True)
+             use_container_width=True)
 except:
     st.write("📷 *FastAPI Swagger UI screenshot would be displayed here*")
 

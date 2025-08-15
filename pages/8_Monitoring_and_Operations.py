@@ -183,6 +183,23 @@ if handler_data:
 else:
     st.info("No endpoint data available")
 
+st.subheader("📊 Live Monitoring Dashboards")
+st.info("💡 Live dashboards work when run locally. Screenshots shown below:")
+
+try:
+    st.image("containers/rakuten_st/images/screenshots/Grafana_available_dashboards.png",
+             caption="Available Grafana dashboards: FastAPI, MLflow, and System metrics",
+             use_container_width=True)
+    
+    st.image("containers/rakuten_st/images/screenshots/ML_flow_dashboard.png",
+             caption="MLflow metrics dashboard showing model performance over time", 
+             use_container_width=True)
+    
+    st.image("containers/rakuten_st/images/screenshots/System_metrics_dashboard.png",
+             caption="System health monitoring with CPU, memory, and infrastructure metrics",
+             use_container_width=True)
+except:
+    st.write("📷 *Monitoring screenshots would be displayed here when running locally*")
 
 # Pagination and footer
 st.markdown("---")

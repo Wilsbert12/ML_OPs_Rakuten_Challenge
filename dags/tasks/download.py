@@ -21,6 +21,10 @@ def download_raw_data():
     
     for filename, url in files.items():
         dest_path = os.path.join(raw_data_dir, filename)
+        # Skip if file already exists
+        if os.path.exists(dest_path):
+            print(f"Skipping {filename} - already exists")
+            continue
         print(f"Downloading {filename} ...")
         response = requests.get(url, headers=headers, cookies=cookies)
         response.raise_for_status()

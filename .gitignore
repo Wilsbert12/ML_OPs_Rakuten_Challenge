@@ -14,4 +14,5 @@ __pycache__/
 # Models directory (keep only .gitkeep)
 models/*
 !models/.gitkeep
-/containers/rakuten-ml/__pycache__
+/containers/rakuten-ml/__pycache__.DS_Store
+**/.DS_Store

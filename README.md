@@ -2,6 +2,14 @@
 
 This project demonstrates a complete MLOps pipeline for the [Rakuten product classification challenge](https://challengedata.ens.fr/participants/challenges/35/), focusing on deployment, versioning, and operational aspects rather than model accuracy.
 
+## Key Achievements ⭐
+- **Production-Ready MLOps Pipeline**: Complete automated workflow from data ingestion to model deployment
+- **Intelligent Retraining**: Smart triggers based on performance degradation and data drift (not just scheduled)
+- **Real-Time API**: FastAPI service with live predictions and human-readable responses
+- **Enterprise Monitoring**: Prometheus + Grafana dashboards tracking ML and system metrics
+- **Containerized Architecture**: 8+ microservices orchestrated with Docker Compose
+- **Operational Intelligence**: Data quality monitoring, drift detection, and automated alerts
+
 ## Table of Contents
 - [Project Overview](#project-overview)
 - [Project Structure](#project-structure)
@@ -25,34 +33,127 @@ This project demonstrates a complete MLOps pipeline for the [Rakuten product cla
 - **Current Performance**: SVM achieves 73.4% F1 score on French text classification
 - **Status**: ✅ **Production-ready** with intelligent retraining and comprehensive monitoring
 
+## Architecture Overview
+
+```mermaid
+graph TB
+    %% Orchestration
+    subgraph Orchestration ["ORCHESTRATION"]
+        Airflow[<b>Airflow Container</b>]
+    end
+    
+    %% Data Ingestion
+    subgraph DataIngestion ["Data Ingestion"]
+        DataDAG[<b>Data Preparation DAG</b>]
+        PostgreSQL[("<b>PostgreSQL Database (container)</b>")]
+        MinIO[("<b>MinIO Object Storage (container)</b>")]
+        
+        DataDAG -->|2k batches every 15min| DataDAG
+        DataDAG --> PostgreSQL
+        DataDAG -.->|"<i>(currently not in use)</i>"| MinIO
+    end
+    
+    %% Model Training
+    subgraph ModelTraining ["Model Training"]
+        MLDAG[<b>ML Pipeline DAG</b>]
+        MLContainer[<b>ML Container</b>]
+        Training[<b>Model Training<br/>GridSearchCV</b>]
+        Evaluation[<b>Model Evaluation</b>]
+        MLflow[("<b>MLflow Model Registry (container)</b>")]
+        
+        MLDAG --> MLContainer
+        MLContainer --> Training
+        Training --> Evaluation
+        Evaluation --> MLflow
+        MLflow -->|current best model| MLContainer
+        MLContainer --> FastAPI
+    end
+    
+    %% Real-time Serving
+    subgraph RealTimeServing ["Real-time Serving"]
+        FastAPI[<b>FastAPI Container</b>]
+        RealTimeRequests[<b>Real Time Requests</b>]
+        RealTimePredictions[<b>Real Time Predictions</b>]
+        
+        RealTimeRequests --> FastAPI
+        FastAPI --> RealTimePredictions
+    end
+    
+    %% Monitoring
+    subgraph Monitoring ["Monitoring"]
+        Prometheus[<b>Prometheus Container</b>]
+    end
+    
+    %% Visualization
+    subgraph Visualization ["Visualization"]
+        Grafana[<b>Grafana Container</b>]
+    end
+    
+    %% Triggering
+    subgraph Triggering ["Triggering"]
+        Accuracy[<b>Accuracy Monitoring</b>]
+        DataBacklog[<b>Data Backlog</b>]
+        DriftDetection[<b>Drift Detection<br/>Evidently</b>]
+        SmartTrigger[<b>Smart Trigger Mechanism<br/>F1 < 0.7 OR Backlog ≥ 10k</b>]
+        RetrainTrigger{<b>Retraining Trigger</b>}
+        
+        PostgreSQL --> DriftDetection
+        PostgreSQL --> Accuracy
+        PostgreSQL --> DataBacklog
+        Accuracy --> SmartTrigger
+        DataBacklog --> SmartTrigger
+        DriftDetection --> SmartTrigger
+        SmartTrigger --> RetrainTrigger
+        RetrainTrigger -.->|only if needed| MLDAG
+    end
+    
+    %% Connections between subgraphs
+    FastAPI --> Prometheus
+    MLContainer --> Prometheus
+    Prometheus --> Grafana
+    Airflow --> DataDAG
+    Airflow --> MLDAG
+    
+    %% Styling
+    classDef container fill:#e1f5fe,color:#000000
+    classDef storage fill:#f3e5f5,color:#000000
+    classDef service fill:#e8f5e8,color:#000000
+    classDef monitoring fill:#fff3e0,color:#000000
+    
+    class MLContainer,FastAPI,Airflow,Prometheus,Grafana container
+    class PostgreSQL,MinIO,MLflow storage
+    class DataDAG,MLDAG service
+    class Accuracy,DataBacklog,DriftDetection monitoring
+```
+
 ## Project Structure
 
 ```
 rakuten_project/
-├── main.py                  # FastAPI application ⭐ NEW
-├── Dockerfile.api          # FastAPI container definition ⭐ NEW  
-├── requirements_api.txt    # FastAPI dependencies ⭐ NEW
+├── main.py                  # FastAPI application
+├── Dockerfile.api          # FastAPI container definition  
+├── requirements_api.txt    # FastAPI dependencies
 ├── config/                  # Configuration files
 │   └── airflow.cfg         # Airflow configuration
 ├── dags/                    # Airflow DAGs for workflow orchestration
-│   ├── ml_pipeline_docker_dag.py  # ML pipeline with smart triggers ⭐ UPDATED
-│   ├── prepare_data_dag.py # Data preparation workflow (15min schedule) ⭐ UPDATED
-│   ├── reset_data_dag.py   # Database reset and test data creation ⭐ NEW
-│   ├── drift_detection_dag.py # Data drift monitoring (2hr schedule) ⭐ NEW
+│   ├── ml_pipeline_docker_dag.py  # ML pipeline with smart triggers
+│   ├── prepare_data_dag.py # Data preparation workflow (15min schedule)
+│   ├── reset_data_dag.py   # Database reset and test data creation
+│   ├── drift_detection_dag.py # Data drift monitoring (2hr schedule)
 │   └── tasks/              # Airflow task modules
 │       ├── ml_tasks.py     # ML pipeline tasks
 │       ├── upload.py       # Data upload functions
-│       ├── download.py     # Data download functions ⭐ NEW
+│       ├── download.py     # Data download functions
 │       └── utils.py        # Utility functions
 ├── containers/              # Docker container definitions
 │   └── rakuten-ml/         # ML pipeline container
 │       ├── Dockerfile      
 │       ├── preprocessing.py 
-│       ├── training.py     # Model training with GridSearchCV & quality gates ⭐ UPDATED
-│       ├── predict.py      # Single prediction script with best model selection ⭐ UPDATED
-│       ├── category_mapping.json # Category ID to name mapping ⭐ NEW
+│       ├── training.py     # Model training with GridSearchCV & quality gates
+│       ├── predict.py      # Single prediction script with best model selection
+│       ├── category_mapping.json # Category ID to name mapping
 │       └── requirements_ml.txt # ML-specific dependencies
-├── monitoring/              # Monitoring stack configuration ⭐ NEW
+├── monitoring/              # Monitoring stack configuration
 │   ├── prometheus.yml      # Prometheus configuration
 │   └── grafana/            # Grafana dashboards and provisioning
 ├── scripts/                 # Setup scripts only
@@ -65,7 +166,7 @@ rakuten_project/
 ├── src/                     # Source code (legacy)
 │   ├── load_minio.py       # MinIO object storage operations
 │   ├── load_postgres.py    # PostgreSQL database operations
-│   └── (API components completed) ⭐ NEW
+│   └── (API components completed)
 ├── .env                    # Environment variables
 ├── .gitignore
 ├── docker-compose.yml      # Docker services configuration
@@ -84,12 +185,38 @@ git clone https://github.com/Pockyee/rakuten_project.git
 cd rakuten_project
 ```
 
+### Data Download Requirements
+
+The Rakuten dataset requires authentication. You have two options:
+
+**Option 1: Manual Download (Recommended)**
+1. Visit [Rakuten Challenge Page](https://challengedata.ens.fr/participants/challenges/35/)
+2. Log in with your credentials
+3. Download `x_train.csv`, `y_train.csv`, and `x_test.csv` manually
+4. **Important**: Ensure files are named exactly as follows (lowercase, no extra characters):
+   - `x_train.csv`
+   - `y_train.csv` 
+   - `x_test.csv`
+5. Remove any random characters or timestamps from filenames
+6. Place them in the `raw_data/` directory
+
+**Option 2: Use Download Script**
+1. Update session cookies in `./scripts/2_download.sh` (cookies expire regularly)
+2. Run `./scripts/2_download.sh`
+
+**Note:** Downloaded files may have random characters or different casing. Always rename them to the exact lowercase format above before proceeding.
+
 ### Setup Infrastructure and Environment
 Follow the automated setup process:
 
 **Make scripts executable:**
 ```bash
 chmod +x ./scripts/*
+```
+
+**Note for Mac users:** If you already have Docker installed and skip script 1, you may need to install wget:
+```bash
+brew install wget
 ```
 
 **Run setup scripts in order:**
@@ -116,22 +243,22 @@ docker compose up -d               # Standard way to start all services
   - **Username:** None required  
   - **Password:** None required
 
-- **FastAPI API** (Real-time Predictions): [http://localhost:8000/docs](http://localhost:8000/docs) ⭐ **NEW**
+- **FastAPI API** (Real-time Predictions): [http://localhost:8000/docs](http://localhost:8000/docs)
   - **Interactive docs**: Test predictions in real-time
   - **Prediction endpoint**: `POST /predict/`
 
-- **Grafana** (Monitoring Dashboards): [http://localhost:3000](http://localhost:3000) ⭐ **NEW**
+- **Grafana** (Monitoring Dashboards): [http://localhost:3000](http://localhost:3000)
   - **Username:** `admin`  
   - **Password:** `rakutenadmin`
 
-- **Prometheus** (Metrics Collection): [http://localhost:9090](http://localhost:9090) ⭐ **NEW**
+- **Prometheus** (Metrics Collection): [http://localhost:9090](http://localhost:9090)
   - **Metrics endpoint**: Real-time system and ML metrics
 
-- **Grafana** (Monitoring Dashboards): [http://localhost:3000](http://localhost:3000) ⭐ **NEW**
+- **Grafana** (Monitoring Dashboards): [http://localhost:3000](http://localhost:3000)
   - **Username:** `admin`  
   - **Password:** `admin`
 
-- **Prometheus** (Metrics Collection): [http://localhost:9090](http://localhost:9090) ⭐ **NEW**
+- **Prometheus** (Metrics Collection): [http://localhost:9090](http://localhost:9090)
   - **Username:** None required  
   - **Password:** None required
 
@@ -169,8 +296,8 @@ The FastAPI service is automatically built and started by the setup script. No a
 ### Access Services
 
 - **MLflow UI** (Experiment Tracking): [http://localhost:5001](http://localhost:5001)
-- **FastAPI API** (Real-time Predictions): [http://localhost:8000/docs](http://localhost:8000/docs) ⭐ **NEW**
-- **Grafana Dashboards** (Operational Monitoring): [http://localhost:3000](http://localhost:3000) ⭐ **NEW**
+- **FastAPI API** (Real-time Predictions): [http://localhost:8000/docs](http://localhost:8000/docs)
+- **Grafana Dashboards** (Operational Monitoring): [http://localhost:3000](http://localhost:3000)
 
 ### Test Real-time Predictions
 
@@ -210,18 +337,18 @@ curl -X POST "http://localhost:8000/predict/" \
   - TF-IDF feature extraction (1000 features)
 - **Output**: Processed features, targets, and vectorizer saved to `processed_data/`
 
-### Model Training (`containers/rakuten-ml/training.py`) ⭐ UPDATED
+### Model Training (`containers/rakuten-ml/training.py`)
 - **Input**: Preprocessed features from previous step
 - **Algorithms**: Random Forest, Logistic Regression, SVM, XGBoost
 - **Optimization**: GridSearchCV with 3-fold cross-validation
-- **Quality Gates**: Only deploys models that outperform current production model ⭐ NEW
+- **Quality Gates**: Only deploys models that outperform current production model
 - **Evaluation**: Weighted F1 score, accuracy, classification report
 - **Output**: Best model saved as `the_best_model.pkl` only when quality criteria met
 
-### Single Prediction (`containers/rakuten-ml/predict.py`) ⭐ UPDATED
+### Single Prediction (`containers/rakuten-ml/predict.py`)
 - **Input**: Single product title and description
 - **Processing**: Reuses existing preprocessing pipeline for consistency
-- **Model Selection**: Automatically uses current best model (quality-gated) ⭐ NEW
+- **Model Selection**: Automatically uses current best model (quality-gated)
 - **Output**: Structured prediction with category mapping and confidence scores
 - **Integration**: Called directly by FastAPI for real-time predictions
 
@@ -232,16 +359,32 @@ curl -X POST "http://localhost:8000/predict/" \
 - **Test Accuracy**: 73.1%
 - **Cross-validation Score**: 71.6%
 
-## Real-time Prediction API ⭐ NEW
+## System in Action
 
-### FastAPI Service (`main.py`)
-- **Architecture**: Containerized microservice with direct function calls
-- **Input**: Product title and description (French text)
-- **Processing**: Uses existing ML pipeline for consistent preprocessing
-- **Output**: Human-readable category names with confidence scores
-- **Performance**: Fast response times with memory-safe execution
+### Workflow Orchestration
+![ML Pipeline Orchestration](containers/rakuten_st/images/screenshots/ml_pipeline_docker.png)
+*Airflow DAG managing the complete ML pipeline with intelligent triggers*
 
-### Example API Response
+![Training Workflow](containers/rakuten_st/images/screenshots/training_dag.png)
+*Detailed view of model training orchestration and task dependencies*
+
+### ML Experiment Tracking
+![MLflow Experiment Results](containers/rakuten_st/images/screenshots/training_result.png)
+*MLflow tracking model performance, metrics, and experiment versioning*
+
+## Real-time Prediction API
+
+### Quick Demo - Live Predictions
+
+**Input:**
+```json
+{
+  "title": "Nintendo Switch",
+  "description": "console de jeux portable"
+}
+```
+
+**Output:**
 ```json
 {
   "predictions": [{
@@ -257,7 +400,60 @@ curl -X POST "http://localhost:8000/predict/" \
 }
 ```
 
-### Category Mapping (`containers/rakuten-ml/category_mapping.json`) ⭐ NEW
+**Try it live:** [http://localhost:8000/docs](http://localhost:8000/docs)
+
+### API Documentation Interface
+
+![FastAPI Overview](containers/rakuten_st/images/screenshots/MLOPs_fast_API_overview.png)
+*FastAPI interactive documentation with all endpoints*
+
+![Prediction Endpoint](containers/rakuten_st/images/screenshots/MLOPs_fast_api_predict.png)  
+*Detailed prediction endpoint with request/response examples*
+
+### API Endpoints
+
+**Core Prediction Service:**
+- `POST /predict/` - Classify product into category
+- `GET /` - API status and welcome message
+- `GET /health` - System health check with service status
+
+**ML Operations:**
+- `POST /training/` - Trigger model training (with background processing)
+- `GET /training/status` - Check training progress and results
+- `GET /models/` - List available models from MLflow registry
+
+### FastAPI Service (`main.py`)
+- **Architecture**: Containerized microservice with direct function calls
+- **Input**: Product title and description (French text)
+- **Processing**: Uses existing ML pipeline for consistent preprocessing
+- **Output**: Human-readable category names with confidence scores
+- **Performance**: Fast response times with memory-safe execution
+- **Error Handling**: Comprehensive validation and error responses
+- **Integration**: Direct connection to MLflow tracking server
+
+### Prediction Request Format
+```json
+{
+  "title": "Product title (required)",
+  "description": "Product description (required)", 
+  "model_id": "rakuten_classifier (optional)"
+}
+```
+
+### Health Check Response
+```json
+{
+  "status": "healthy",
+  "training_active": false,
+  "services": {
+    "api": "running",
+    "mlflow_tracking (internal)": "http://mlflow:5000",
+    "mlflow_tracking (public)": "http://YOUR_IP:5001"
+  }
+}
+```
+
+### Category Mapping (`containers/rakuten-ml/category_mapping.json`)
 Maps numeric category IDs to human-readable category names:
 - **Books**: Books > Magazine, Books > eBooks, Books > Stationery Supplies
 - **Video Games & Consoles**: Video Games, Consoles, Video Game Accessories
@@ -265,7 +461,7 @@ Maps numeric category IDs to human-readable category names:
 - **Home & Garden**: Furniture, Household Linens, decoration, Garden tools
 - **And more...**: 27 total categories with subcategories
 
-## Intelligent MLOps System ⭐ NEW
+## Intelligent MLOps System
 
 ### Smart Retraining Triggers
 The system implements intelligent retraining based on multiple signals:
@@ -280,7 +476,7 @@ The system implements intelligent retraining based on multiple signals:
 - Reliable trigger mechanism with 2k entries loaded every 15 minutes
 - No false positives or missed trigger conditions
 
-### Monitoring Stack ⭐ NEW
+### Monitoring Stack
 **Components:**
 - **Prometheus**: Metrics collection via StatsD exporter (port 9102)
 - **Grafana**: Real-time dashboards with MLflow metrics visualization
@@ -294,7 +490,7 @@ The system implements intelligent retraining based on multiple signals:
 
 **Access Grafana:** [http://localhost:3000](http://localhost:3000) → "MLflow Metrics" dashboard
 
-### Data Quality & Drift Monitoring ⭐ NEW
+### Data Quality & Drift Monitoring
 **Drift Detection DAG (`drift_detection_dag.py`):**
 - **Schedule**: Every 2 hours (configurable)
 - **Method**: Evidently framework for statistical drift analysis
@@ -311,7 +507,7 @@ The system implements intelligent retraining based on multiple signals:
 
 ### Application Containers
 - **ML Container** (`rakuten-ml:latest`): Complete ML pipeline with all dependencies
-- **FastAPI Container** (`rakuten-fastapi:latest`): Real-time prediction service ⭐ NEW
+- **FastAPI Container** (`rakuten-fastapi:latest`): Real-time prediction service
 
 ### Infrastructure Containers
 - **Airflow**: Workflow orchestration and scheduling
@@ -321,9 +517,9 @@ The system implements intelligent retraining based on multiple signals:
 - **MinIO**: Object storage for images and large files
 - **Redis**: Airflow message broker and caching
 - **MLflow**: Experiment tracking and model registry
-- **Prometheus**: Metrics collection and storage ⭐ NEW
-- **Grafana**: Monitoring dashboards and visualization ⭐ NEW
-- **StatsD Exporter**: ML metrics bridge for Prometheus integration ⭐ NEW
+- **Prometheus**: Metrics collection and storage
+- **Grafana**: Monitoring dashboards and visualization
+- **StatsD Exporter**: ML metrics bridge for Prometheus integration
 
 ### Container Orchestration
 All services run in isolated Docker containers with:
@@ -332,9 +528,20 @@ All services run in isolated Docker containers with:
 - **Health Checks**: Automatic service health monitoring
 - **Dependency Management**: Proper startup order and dependencies
 
-## MLOps Operational Metrics ⭐ UPDATED
+## MLOps Operational Metrics
 
 The system actively tracks and visualizes comprehensive MLOps metrics:
+
+### Live Monitoring Dashboards
+
+![Grafana Dashboards](containers/rakuten_st/images/screenshots/Grafana_available_dashboards.png)
+*Available monitoring dashboards: FastAPI metrics, MLflow metrics, and system health*
+
+![MLflow Dashboard](containers/rakuten_st/images/screenshots/ML_flow_dashboard.png)
+*Live MLflow metrics dashboard showing model performance tracking over time*
+
+![System Metrics Dashboard](containers/rakuten_st/images/screenshots/System_metrics_dashboard.png)
+*Comprehensive system health monitoring with CPU, memory, and infrastructure metrics*
 
 **Model Performance Tracking (Live):**
 - F1 Score, Accuracy, Precision, Recall
@@ -367,22 +574,22 @@ The system actively tracks and visualizes comprehensive MLOps metrics:
 - **Training Operations**: Total model runs, best scores in last 24 hours
 - **System Health**: API metrics, container status, resource utilization
 
-## Technology Stack ⭐ UPDATED
+## Technology Stack
 
 - **Orchestration**: Apache Airflow with intelligent scheduling
 - **Database**: PostgreSQL (containerized) with automated backup
 - **Object Storage**: MinIO (for images and large artifacts)
 - **ML Pipeline**: Docker containers with scikit-learn stack
 - **ML Tracking**: MLflow with experiment versioning
-- **API**: FastAPI (containerized microservice) for real-time predictions ⭐ **NEW**
-- **Monitoring**: Prometheus + Grafana + StatsD for comprehensive observability ⭐ **NEW**
-- **Data Quality**: Evidently framework for drift detection ⭐ **NEW**
+- **API**: FastAPI (containerized microservice) for real-time predictions
+- **Monitoring**: Prometheus + Grafana + StatsD for comprehensive observability
+- **Data Quality**: Evidently framework for drift detection
 - **Architecture**: Microservices with direct function calls for optimal performance
 - **Containerization**: Docker and Docker Compose with full orchestration
 - **Models**: Scikit-learn (XGBoost, Random Forest, Logistic Regression, SVM)
 - **Text Processing**: NLTK, TF-IDF vectorization with French language support
 - **Testing**: Pytest with comprehensive pipeline validation
-- **Intelligent Retraining**: Multi-signal trigger system (F1 + backlog + drift) ⭐ **NEW**
+- **Intelligent Retraining**: Multi-signal trigger system (F1 + backlog + drift)
 
 ## Development Workflow
 
@@ -394,7 +601,7 @@ The system actively tracks and visualizes comprehensive MLOps metrics:
 5. Test DAG execution in Airflow UI
 6. Submit pull request with comprehensive testing
 
-### For API Development ⭐ NEW
+### For API Development
 1. Create feature branch from main
 2. Modify `main.py` and related API components
 3. Test API locally: `python main.py`
@@ -402,7 +609,7 @@ The system actively tracks and visualizes comprehensive MLOps metrics:
 5. Test API endpoints using FastAPI docs interface
 6. Submit pull request with API testing documentation
 
-### For Monitoring Development ⭐ NEW
+### For Monitoring Development
 1. Modify Prometheus configuration in `monitoring/prometheus.yml`
 2. Update Grafana dashboards in `monitoring/grafana/`
 3. Test metrics collection: check [http://localhost:9090](http://localhost:9090)
@@ -422,8 +629,8 @@ Each team member should:
 1. Clone this repository
 2. Set up local development environment (virtual environment + requirements)
 3. Run setup scripts to initialize Docker infrastructure
-4. Build ML container and FastAPI container for development work ⭐ **NEW**
-5. Access monitoring dashboards for operational visibility ⭐ **NEW**
+4. Build ML container and FastAPI container for development work
+5. Access monitoring dashboards for operational visibility
 6. Develop and test locally using containerized approach
 
 ## Troubleshooting
@@ -463,7 +670,7 @@ docker build --no-cache -f Dockerfile.api -t rakuten-fastapi:latest .
 - Refresh Airflow UI
 - Check Airflow scheduler logs
 
-**FastAPI prediction errors:** ⭐ NEW
+**FastAPI prediction errors:**
 - Check container logs: `docker logs rakuten-fastapi`
 - Verify ML models are accessible: `docker exec rakuten-fastapi ls /app/models/`
 - Test ML pipeline directly: Use containers/rakuten-ml/predict.py
@@ -477,12 +684,12 @@ docker build --no-cache -f Dockerfile.api -t rakuten-fastapi:latest .
 
 1. Create feature branch from main
 2. Make changes and test locally using Docker containers
-3. Ensure all ML scripts, API endpoints, and monitoring work in containerized environment ⭐ **NEW**
+3. Ensure all ML scripts, API endpoints, and monitoring work in containerized environment
 4. Update documentation as needed
 5. Submit pull request with detailed description
 6. Ensure all tests pass and DAGs execute successfully
 
-## Future Enhancements ⭐ UPDATED
+## Future Enhancements
 
 - **API security with tokens**: Implement authentication and authorization for production endpoints
 - **Kubernetes deployment**: Container orchestration at scale with automatic scaling and high availability
@@ -498,7 +705,7 @@ docker build --no-cache -f Dockerfile.api -t rakuten-fastapi:latest .
 - **A/B Testing Framework**: Automated model comparison and gradual rollout capabilities
 - **Advanced Drift Detection**: Multi-dimensional drift analysis with custom thresholds per feature
 
-## Project Status ✅ FULLY OPERATIONAL ⭐ UPDATED
+## Project Status ✅ FULLY OPERATIONAL
 
 - ✅ **Infrastructure**: All Docker services running (Airflow, PostgreSQL, MinIO, MLflow, Redis, Prometheus, Grafana)
 - ✅ **Data Pipeline**: Complete incremental loading (2k samples/15min) and data management

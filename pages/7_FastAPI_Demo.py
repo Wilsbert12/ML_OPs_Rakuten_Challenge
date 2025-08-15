@@ -164,13 +164,23 @@ st.divider()
 st.subheader("📸 API Documentation Interface")
 st.info("💡 Live integration works when run locally. Screenshots shown below:")
 
-# Add placeholder for FastAPI screenshot
+st.subheader("📸 API Documentation Interface")
+st.info("💡 Live integration works when run locally. Screenshots shown below:")
+
 try:
-    st.image("containers/rakuten_st/images/screenshots/fastapi-swagger.png", 
+    st.image("containers/rakuten_st/images/screenshots/MLOPs_fast_API_overview.png", 
              caption="FastAPI Interactive Documentation (Swagger UI)",
              use_container_width=True)
+    
+    st.image("containers/rakuten_st/images/screenshots/MLOPs_fast_api_predict.png", 
+             caption="Prediction endpoint with request/response examples",
+             use_container_width=True)
+    
+    st.image("containers/rakuten_st/images/screenshots/fast_api_example_output.png", 
+             caption="Example API response with category predictions",
+             use_container_width=True)
 except:
-    st.write("📷 *FastAPI Swagger UI screenshot would be displayed here*")
+    st.write("📷 *API screenshots would be displayed here when running locally*")
 
 # Horizontal line as divider for better layout
 st.divider()

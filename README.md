@@ -2,6 +2,8 @@
 
 This project demonstrates a complete MLOps pipeline for the [Rakuten product classification challenge](https://challengedata.ens.fr/participants/challenges/35/), focusing on deployment, versioning, and operational aspects rather than model accuracy.
 
+You can find a live demo of the project here: [Streamlit Demo](https://mlops-rakuten-challenge.streamlit.app/).
+
 ## Key Achievements ⭐
 - **Production-Ready MLOps Pipeline**: Complete automated workflow from data ingestion to model deployment
 - **Intelligent Retraining**: Smart triggers based on performance degradation and data drift (not just scheduled)

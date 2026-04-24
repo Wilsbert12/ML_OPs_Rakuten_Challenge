@@ -4,7 +4,7 @@ This project demonstrates a complete MLOps pipeline for the [Rakuten product cla
 
 You can find a live demo of the project here: [Streamlit Demo](https://mlops-rakuten-challenge.streamlit.app/).
 
-## Key Achievements ⭐
+## Key Achievements 
 - **Production-Ready MLOps Pipeline**: Complete automated workflow from data ingestion to model deployment
 - **Intelligent Retraining**: Smart triggers based on performance degradation and data drift (not just scheduled)
 - **Real-Time API**: FastAPI service with live predictions and human-readable responses
@@ -33,7 +33,7 @@ You can find a live demo of the project here: [Streamlit Demo](https://mlops-rak
 - **Focus**: MLOps infrastructure (MLflow, FastAPI, Docker, model versioning)
 - **Models**: Classical ML pipeline with XGBoost, Random Forest, Logistic Regression, and SVM (with plans to integrate deep learning models later)
 - **Current Performance**: SVM achieves 73.4% F1 score on French text classification
-- **Status**: ✅ **Production-ready** with intelligent retraining and comprehensive monitoring
+- **Status**: **Production-ready** with intelligent retraining and comprehensive monitoring
 
 ## Architecture Overview
 
